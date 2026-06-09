@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Grupo de Estudos Realtime - Farmácia</title>
   
   <!-- Tailwind CSS para Estilização Premium -->
@@ -53,7 +53,7 @@
     .theme-text-muted { color: var(--text-muted) !important; }
     .theme-border { border-color: var(--border-color) !important; }
     
-    /* Destaques e Destaque do Pomodoro */
+    /* Destaques e Destaques do Pomodoro */
     .theme-bg-accent { background-color: var(--accent-color) !important; }
     .theme-bg-accent-hover:hover { background-color: var(--accent-hover) !important; }
     .theme-text-accent { color: var(--accent-color) !important; }
@@ -77,15 +77,21 @@
     .scrollbar-thin::-webkit-scrollbar-thumb:hover {
       background-color: var(--text-muted) !important;
     }
+    
+    /* Impedir rolagem elástica irritante em navegadores móveis */
+    body {
+      touch-action: pan-y;
+      overscroll-behavior-y: none;
+    }
   </style>
 </head>
-<body class="bg-[#020617] text-slate-100 min-h-screen selection:bg-emerald-500/30 selection:text-emerald-300 overflow-hidden font-sans">
-  <div id="root" class="h-screen w-screen overflow-hidden"></div>
+<body class="bg-[#020617] text-slate-100 min-h-screen selection:bg-emerald-500/30 selection:text-emerald-300 overflow-x-hidden font-sans">
+  <div id="root" class="min-h-screen lg:h-screen w-screen overflow-hidden"></div>
   
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo } = React;
     
-    // --- STREAMING_CHUNK: Configurando o Firebase SDK de maneira resiliente... ---
+    // --- STREAMING_CHUNK: Inicializando as credenciais do Firebase de forma resiliente... ---
     const localFirebaseConfig = {
       apiKey: "AIzaSyDWa-JScggDIM0I7pzSzhuSCB3j1jE6cX8",
       authDomain: "farma-ranking-3.firebaseapp.com",
@@ -115,7 +121,7 @@
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'study-group-tracker-v1';
     
-    // --- STREAMING_CHUNK: Definindo Presets, Perfis e Constantes do Sistema... ---
+    // --- STREAMING_CHUNK: Configurando os Presets de Perfis e Paletas de Cores... ---
     const PROFILE_PRESETS = [
       { id: 'key', name: 'Key', avatar: '🦉', markerColor: 'emerald' },
       { id: 'andrey', name: 'Andrey', avatar: '🐙', markerColor: 'indigo' },
@@ -170,7 +176,7 @@
       claro: {
         azul: { '--accent-color': '#2563eb', '--accent-hover': '#1d4ed8', '--accent-muted': 'rgba(37, 99, 235, 0.1)', '--accent-glow': 'rgba(37, 99, 235, 0.3)' },
         lilas: { '--accent-color': '#7c3aed', '--accent-hover': '#6d28d9', '--accent-muted': 'rgba(124, 58, 237, 0.1)', '--accent-glow': 'rgba(124, 58, 237, 0.3)' },
-        cafe: { '--accent-color': '#5c2d12', '--accent-hover': '#451a03', '--accent-muted': 'rgba(92, 45, 18, 0.1)', '--accent-glow': 'rgba(92, 45, 18, 0.3)' },
+        cafe: { '--accent-color': '#b89058', '--accent-hover': '#a37d45', '--accent-muted': 'rgba(184, 144, 88, 0.12)', '--accent-glow': 'rgba(184, 144, 88, 0.35)' },
         verde: { '--accent-color': '#16a34a', '--accent-hover': '#15803d', '--accent-muted': 'rgba(22, 163, 74, 0.1)', '--accent-glow': 'rgba(22, 163, 74, 0.3)' },
         vermelho: { '--accent-color': '#be123c', '--accent-hover': '#9f1239', '--accent-muted': 'rgba(190, 18, 60, 0.1)', '--accent-glow': 'rgba(190, 18, 60, 0.3)' },
         teal: { '--accent-color': '#0d9488', '--accent-hover': '#0f766e', '--accent-muted': 'rgba(13, 148, 136, 0.1)', '--accent-glow': 'rgba(13, 148, 136, 0.3)' }
@@ -178,14 +184,14 @@
       escuro: {
         azul: { '--accent-color': '#3b82f6', '--accent-hover': '#2563eb', '--accent-muted': 'rgba(59, 130, 246, 0.15)', '--accent-glow': 'rgba(59, 130, 246, 0.4)' },
         lilas: { '--accent-color': '#a855f7', '--accent-hover': '#9333ea', '--accent-muted': 'rgba(168, 85, 247, 0.15)', '--accent-glow': 'rgba(168, 85, 247, 0.4)' },
-        cafe: { '--accent-color': '#92400e', '--accent-hover': '#78350f', '--accent-muted': 'rgba(146, 64, 14, 0.15)', '--accent-glow': 'rgba(146, 64, 14, 0.4)' },
+        cafe: { '--accent-color': '#dfb982', '--accent-hover': '#cfa46b', '--accent-muted': 'rgba(223, 185, 130, 0.15)', '--accent-glow': 'rgba(223, 185, 130, 0.4)' },
         verde: { '--accent-color': '#10b981', '--accent-hover': '#059669', '--accent-muted': 'rgba(16, 185, 129, 0.15)', '--accent-glow': 'rgba(16, 185, 129, 0.4)' },
         vermelho: { '--accent-color': '#f43f5e', '--accent-hover': '#e11d48', '--accent-muted': 'rgba(244, 63, 94, 0.15)', '--accent-glow': 'rgba(244, 63, 94, 0.4)' },
         teal: { '--accent-color': '#14b8a6', '--accent-hover': '#0d9488', '--accent-muted': 'rgba(20, 184, 166, 0.15)', '--accent-glow': 'rgba(20, 184, 166, 0.4)' }
       }
     };
 
-    // --- STREAMING_CHUNK: Implementando Ícones Vetoriais Universais... ---
+    // --- STREAMING_CHUNK: Criando componentes de ícones universais em SVG... ---
     const Icon = ({ name, className = "w-5 h-5", ...props }) => {
       const icons = {
         Play: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><polygon points="6 3 20 12 6 21 6 3"/></svg>,
@@ -212,12 +218,16 @@
         MessageCircle: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>,
         Send: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
         ChevronLeft: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><polyline points="15 18 9 12 15 6"/></svg>,
-        Music: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Music: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
+        Eye: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+        EyeOff: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
+        Menu: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+        MoreHorizontal: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
       };
       return icons[name] || null;
     };
 
-    // --- STREAMING_CHUNK: Declarando componentes de ícones funcionais para compilação... ---
+    // --- STREAMING_CHUNK: Declarando aliases para compatibilidade com os nomes de ícones do JSX... ---
     const BarChart3 = (props) => <Icon name="BarChart3" {...props} />;
     const Clock = (props) => <Icon name="Clock" {...props} />;
     const BookOpen = (props) => <Icon name="BookOpen" {...props} />;
@@ -231,8 +241,12 @@
     const Target = (props) => <Icon name="Target" {...props} />;
     const Send = (props) => <Icon name="Send" {...props} />;
     const Music = (props) => <Icon name="Music" {...props} />;
+    const Eye = (props) => <Icon name="Eye" {...props} />;
+    const EyeOff = (props) => <Icon name="EyeOff" {...props} />;
+    const MenuIcon = (props) => <Icon name="Menu" {...props} />;
+    const MoreIcon = (props) => <Icon name="MoreHorizontal" {...props} />;
 
-    // --- STREAMING_CHUNK: Definindo Componente SVG Especial de Farmácia... ---
+    // --- STREAMING_CHUNK: Componente Exclusivo de Ícone da Farmácia (Cálice de Hígia / Serpente)... ---
     function PharmacyIcon(props) {
       const className = props && props.className ? props.className : "w-6 h-6";
       return (
@@ -246,7 +260,7 @@
       );
     }
 
-    // --- STREAMING_CHUNK: Funções de Suporte para Datas, Prazos e Presenças... ---
+    // --- STREAMING_CHUNK: Utilitários matemáticos e de calendário para cronômetro e ranking... ---
     function getStartOfWeek() {
       const d = new Date();
       const day = d.getDay();
@@ -259,6 +273,14 @@
     function getStartOfMonth() {
       const d = new Date();
       return new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+    }
+
+    function safeParseDate(field) {
+      if (!field) return new Date();
+      if (typeof field.toDate === 'function') return field.toDate();
+      if (field.seconds) return new Date(field.seconds * 1000);
+      const parsed = new Date(field);
+      return isNaN(parsed.getTime()) ? new Date() : parsed;
     }
 
     function getParticipantBadges(uStats) {
@@ -292,23 +314,20 @@
       if (rankingFilter === 'semanal') {
         const startOfWeek = getStartOfWeek();
         return list.filter(s => {
-          if (!s.startTime) return false;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           return sDate >= startOfWeek;
         });
       }
       if (rankingFilter === 'mensal') {
         const startOfMonth = getStartOfMonth();
         return list.filter(s => {
-          if (!s.startTime) return false;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           return sDate >= startOfMonth;
         });
       }
       if (rankingFilter === 'mensal-passado' && selectedPastMonth) {
         return list.filter(s => {
-          if (!s.startTime) return false;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           const label = sDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
           return label.toLowerCase() === selectedPastMonth.toLowerCase();
         });
@@ -316,7 +335,7 @@
       return list;
     }
 
-    // --- STREAMING_CHUNK: Conversores Inteligentes de Links de Música... ---
+    // --- CONVERSORES INTELIGENTES DE LINKS DE MÚSICA ---
     function getSpotifyEmbed(url) {
       if (!url) return null;
       const reg = /spotify\.com\/(playlist|album|track|artist)\/([a-zA-Z0-9]+)/;
@@ -346,7 +365,7 @@
       return null;
     }
 
-    // --- STREAMING_CHUNK: Setup de Pontes Globais e Controle de Sincronia... ---
+    // --- SETUP DE COMPATIBILIDADE SÍNCRONA ---
     window.studyTimerBridge = window.studyTimerBridge || {};
     window.studyProfileBridge = window.studyProfileBridge || {};
     window.studySubjectBridge = window.studySubjectBridge || {};
@@ -359,8 +378,9 @@
       const chatEndRef = useRef(null);
       const timerBaseTimeRef = useRef(null);
       const timerAccumulatedSecondsRef = useRef(0);
+      const lastSyncedSecondRef = useRef(-1);
       
-      const isTimerRunningRef = useRef(isTimerRunning);
+      const isTimerRunningRef = useRef(false);
       const handleStartTimerRef = useRef(null);
       const handlePauseTimerRef = useRef(null);
       const handleStopTimerRef = useRef(null);
@@ -369,15 +389,50 @@
       const [localNotification, setLocalNotification] = useState(null);
       const [user, setUser] = useState(null);
       const [loadingAuth, setLoadingAuth] = useState(true);
-      const [activeProfile, setActiveProfile] = useState(null); 
+
+      // Recupera o perfil ativo persistido no navegador para evitar loops de login
+      const [activeProfile, setActiveProfile] = useState(() => {
+        const savedProfileStr = localStorage.getItem('study_active_profile_v2');
+        if (savedProfileStr) {
+          try {
+            return JSON.parse(savedProfileStr);
+          } catch(e) {}
+        }
+        return null;
+      }); 
+
       const [profileToLogin, setProfileToLogin] = useState(null); 
       const [loginEmail, setLoginEmail] = useState('');
       const [loginPassword, setLoginPassword] = useState('');
       const [loginError, setLoginError] = useState('');
       const [isLoggingIn, setIsLoggingIn] = useState(false);
       const [showPassword, setShowPassword] = useState(false);
-      const [selectedMode, setSelectedMode] = useState('escuro');
-      const [selectedColor, setSelectedColor] = useState('verde');
+
+      // Persistência inteligente de modo e cor na inicialização
+      const [selectedMode, setSelectedMode] = useState(() => {
+        const savedProfileStr = localStorage.getItem('study_active_profile_v2');
+        if (savedProfileStr) {
+          try {
+            const p = JSON.parse(savedProfileStr);
+            const savedMode = localStorage.getItem(`study_mode_${p.id}`);
+            if (savedMode) return savedMode;
+          } catch(e) {}
+        }
+        return localStorage.getItem('study_global_mode_v2') || 'escuro';
+      });
+
+      const [selectedColor, setSelectedColor] = useState(() => {
+        const savedProfileStr = localStorage.getItem('study_active_profile_v2');
+        if (savedProfileStr) {
+          try {
+            const p = JSON.parse(savedProfileStr);
+            const savedColor = localStorage.getItem(`study_color_${p.id}`);
+            if (savedColor) return savedColor;
+          } catch(e) {}
+        }
+        return localStorage.getItem('study_global_color_v2') || 'verde';
+      });
+
       const [customProfiles, setCustomProfiles] = useState([]);
       const [activeTab, setActiveTab] = useState('dashboard');
       const [participants, setParticipants] = useState([]);
@@ -418,7 +473,7 @@
       const [profileFormName, setProfileFormName] = useState('');
       const [profileFormAvatar, setProfileFormAvatar] = useState('🪼');
       const [profileFormColor, setProfileFormColor] = useState('violet');
-      const [isChatOpen, setIsChatOpen] = useState(true);
+      const [isChatOpen, setIsChatOpen] = useState(false); // Mobile inicia fechado para otimização de tela
       const [rankingFilter, setRankingFilter] = useState('semanal');
       const [selectedPastMonth, setSelectedPastMonth] = useState('');
       const [tempProfileSelected, setTempProfileSelected] = useState(null);
@@ -429,19 +484,38 @@
       const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
       const [newPlaylistLink, setNewPlaylistLink] = useState('');
 
-      // --- ESTADOS DO CONTADOR FIM DO PERÍODO ---
+      // --- ESTADOS DO CONTADOR FIM DO SEMESTRE ---
       const [endDate, setEndDate] = useState(() => {
         return localStorage.getItem('study_countdown_endDate') || '2026-12-15';
       });
       const [isEditingEndDate, setIsEditingEndDate] = useState(false);
       const [tempEndDate, setTempEndDate] = useState(endDate);
 
-      // Sincroniza tempEndDate local sempre que a data real mudar
+      // --- ESTADOS EXCLUSIVOS DE INTERFACE MOBILE ---
+      const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+      useEffect(() => {
+        if (activeProfile) {
+          localStorage.setItem(`study_mode_${activeProfile.id}`, selectedMode);
+          localStorage.setItem(`study_color_${activeProfile.id}`, selectedColor);
+        }
+        localStorage.setItem('study_global_mode_v2', selectedMode);
+        localStorage.setItem('study_global_color_v2', selectedColor);
+
+        // Aplicar variáveis CSS diretamente ao documentElement (:root) para garantir persistência global
+        const themeVars = THEMES[selectedMode]?.variables || THEMES.escuro.variables;
+        const colorAccent = COLOR_ACCENTS[selectedMode]?.[selectedColor] || COLOR_ACCENTS.escuro.verde;
+        const mergedVars = { ...themeVars, ...colorAccent };
+
+        for (const [key, value] of Object.entries(mergedVars)) {
+          document.documentElement.style.setProperty(key, value);
+        }
+      }, [selectedMode, selectedColor, activeProfile]);
+
       useEffect(() => {
         setTempEndDate(endDate);
       }, [endDate]);
 
-      // --- STREAMING_CHUNK: Impedindo fechamento acidental de aba se houver cronômetro pendente... ---
       useEffect(() => {
         const handleBeforeUnload = (e) => {
           if (isTimerRunning || timerSeconds > 0) {
@@ -457,6 +531,12 @@
         };
       }, [isTimerRunning, timerSeconds]);
 
+      useEffect(() => {
+        if (isChatOpen) {
+          chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, [chatMessages, isChatOpen]);
+
       // --- COMPILADOR DA LISTA TOTAL DE PERFIS ---
       const allProfilesList = useMemo(() => {
         return [...PROFILE_PRESETS, ...customProfiles];
@@ -471,7 +551,9 @@
         };
       }, [selectedMode, selectedColor]);
 
-      // --- STREAMING_CHUNK: Métodos auxiliares contra falhas... ---
+      const isDarkMode = selectedMode === 'escuro';
+
+      // --- STREAMING_CHUNK: Métodos auxiliares para interações e notificações locais... ---
       function triggerLocalNotification(text) {
         setLocalNotification(text);
         setTimeout(() => {
@@ -532,11 +614,15 @@
 
       function selectProfile(profile) {
         setActiveProfile(profile);
+        localStorage.setItem('study_active_profile_v2', JSON.stringify(profile));
         setSessionJoinTime(Date.now());
+        
         const savedMode = localStorage.getItem(`study_mode_${profile.id}`) || profile.userMode || 'escuro';
         const savedColor = localStorage.getItem(`study_color_${profile.id}`) || profile.userColor || 'verde';
+        
         setSelectedMode(savedMode);
         setSelectedColor(savedColor);
+        
         setProfileToLogin(null);
         setTempProfileSelected(null);
         setLoginEmail('');
@@ -585,7 +671,7 @@
         }
       }
 
-      // --- STREAMING_CHUNK: Controladores reativos do Temporizador do Usuário... ---
+      // --- STREAMING_CHUNK: Métodos reativos e síncronos de controle de tempo do cronômetro... ---
       function updateFirebaseTimerState(seconds, isRunning, stage, targetSecs) {
         const currentStage = typeof stage !== 'undefined' ? stage : pomodoroStage;
         if (!activeProfile || apiDisabledError || !db) return;
@@ -631,6 +717,7 @@
         } else {
           timerAccumulatedSecondsRef.current = timerSeconds;
         }
+        lastSyncedSecondRef.current = -1;
         setIsTimerRunning(true);
         const sub = subjects?.find(s => s.id === targetSubjectId);
         sendGroupNotification(`iniciou os estudos de ${sub?.name || 'suas matérias'}! 🚀`);
@@ -797,34 +884,37 @@
         }
       }
 
-      // --- STREAMING_CHUNK: Loop de Tempo do Cronômetro Principal... ---
+      // --- STREAMING_CHUNK: Loop de sincronismo reativo do temporizador... ---
       useEffect(() => {
         let intervalId = null;
         if (isTimerRunning) {
           intervalId = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - timerBaseTimeRef.current) / 1000);
+            
             if (timerType === 'free') {
-              setTimerSeconds(prev => {
-                const next = prev + 1;
-                if (next % 10 === 0) {
-                  updateFirebaseTimerState(next, true);
-                }
-                return next;
-              });
+              const nextSeconds = timerAccumulatedSecondsRef.current + elapsed;
+              setTimerSeconds(nextSeconds);
+              
+              if (nextSeconds % 10 === 0 && lastSyncedSecondRef.current !== nextSeconds) {
+                lastSyncedSecondRef.current = nextSeconds;
+                updateFirebaseTimerState(nextSeconds, true);
+              }
             } else {
-              setTimerSeconds(prev => {
-                if (prev <= 1) {
-                  clearInterval(intervalId);
-                  handlePomodoroFinished();
-                  return 0;
+              const nextSeconds = Math.max(0, timerAccumulatedSecondsRef.current - elapsed);
+              
+              if (nextSeconds <= 0) {
+                clearInterval(intervalId);
+                setTimerSeconds(0);
+                handlePomodoroFinished();
+              } else {
+                setTimerSeconds(nextSeconds);
+                if (nextSeconds % 10 === 0 && lastSyncedSecondRef.current !== nextSeconds) {
+                  lastSyncedSecondRef.current = nextSeconds;
+                  updateFirebaseTimerState(nextSeconds, true);
                 }
-                const next = prev - 1;
-                if (next % 10 === 0) {
-                  updateFirebaseTimerState(next, true);
-                }
-                return next;
-              });
+              }
             }
-          }, 1000);
+          }, 100); 
         }
         return () => {
           if (intervalId) clearInterval(intervalId);
@@ -832,36 +922,58 @@
       }, [isTimerRunning, timerType, pomodoroStage, selectedSubjectId, customFocusMinutes, customBreakMinutes]);
 
       useEffect(() => {
+        const handleVisibilityChange = () => {
+          if (document.visibilityState === 'visible' && isTimerRunning) {
+            const elapsed = Math.floor((Date.now() - timerBaseTimeRef.current) / 1000);
+            if (timerType === 'free') {
+              const nextSeconds = timerAccumulatedSecondsRef.current + elapsed;
+              setTimerSeconds(nextSeconds);
+            } else {
+              const nextSeconds = Math.max(0, timerAccumulatedSecondsRef.current - elapsed);
+              if (nextSeconds <= 0) {
+                setTimerSeconds(0);
+                setIsTimerRunning(false);
+                handlePomodoroFinished();
+              } else {
+                setTimerSeconds(nextSeconds);
+              }
+            }
+          }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+      }, [isTimerRunning, timerType, pomodoroStage, customFocusMinutes, customBreakMinutes]);
+
+      useEffect(() => {
         isTimerRunningRef.current = isTimerRunning;
         handleStartTimerRef.current = handleStartTimer;
         handlePauseTimerRef.current = handlePauseTimer;
         handleStopTimerRef.current = handleStopTimer;
-      }, [isTimerRunning, handleStartTimer, handlePauseTimer, handleStopTimer]);
+      }, [isTimerRunning]);
 
       useEffect(() => {
         if (window.pipWindow && !window.pipWindow.closed) {
           const doc = window.pipWindow.document;
           
-          // 1. Atualiza relógio com o tempo ativo
           const clockEl = doc.getElementById('clock');
           if (clockEl) {
             clockEl.textContent = formatTime(timerSeconds);
           }
           
-          // 2. Atualiza botão de Iniciar/Pausar
           const btnPlayPause = doc.getElementById('btn-play-pause');
           if (btnPlayPause) {
             btnPlayPause.innerHTML = isTimerRunning
               ? `<svg style="width:11px;height:11px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg> Pausar`
               : `<svg style="width:11px;height:11px" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg> Iniciar`;
             
-            // Estilização dinâmica baseada no estado ativo
             btnPlayPause.style.borderColor = isTimerRunning ? 'rgba(255, 255, 255, 0.15)' : 'var(--accent-color)';
             btnPlayPause.style.color = isTimerRunning ? 'var(--text-muted)' : 'var(--text-main)';
             btnPlayPause.style.backgroundColor = isTimerRunning ? 'rgba(255, 255, 255, 0.02)' : 'var(--accent-muted)';
           }
           
-          // 3. Atualiza disciplina ativa
           const subjectEl = doc.getElementById('subject');
           if (subjectEl) {
             const sub = subjects.find(s => s.id === selectedSubjectId) || { name: 'Estudos', color: '#10b981' };
@@ -869,7 +981,6 @@
             subjectEl.style.color = sub.color || 'var(--accent-color)';
           }
           
-          // 4. Atualiza badge Pomodoro (Trabalho/Descanso)
           const stageEl = doc.getElementById('stage');
           if (stageEl) {
             if (timerType === 'pomodoro') {
@@ -882,7 +993,6 @@
             }
           }
           
-          // 5. Atualiza barra de progresso do Pomodoro
           const progressContainer = doc.querySelector('.progress-container');
           const progressBar = doc.getElementById('progress-bar');
           if (progressContainer && progressBar) {
@@ -899,7 +1009,7 @@
         }
       }, [timerSeconds, isTimerRunning, selectedSubjectId, subjects, timerType, pomodoroStage, customFocusMinutes, customBreakMinutes, selectedMode, selectedColor]);
 
-      // --- STREAMING_CHUNK: Picture-In-Picture e Relógio Flutuante Avançado... ---
+      // --- STREAMING_CHUNK: Instanciando Relógio Flutuante (Picture-In-Picture nativo ou fallback)... ---
       function triggerPopoutTimer() {
         if ('documentPictureInPicture' in window) {
           if (window.pipWindow) {
@@ -949,8 +1059,15 @@
                 align-items: center;
                 height: 100vh;
                 box-sizing: border-box;
-                overflow: hidden;
+                overflow-y: auto;
                 user-select: none;
+              }
+              body::-webkit-scrollbar {
+                width: 4px;
+              }
+              body::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 99px;
               }
               .widget-container {
                 display: flex;
@@ -1155,6 +1272,7 @@
         }
         setUser(null);
         setActiveProfile(null);
+        localStorage.removeItem('study_active_profile_v2');
         setTempProfileSelected(null);
         setLoginEmail('');
         setLoginPassword('');
@@ -1250,7 +1368,7 @@
           });
         }
         setIsEditingProfile(false);
-        triggerLocalNotification("Perfil updated com sucesso!");
+        triggerLocalNotification("Perfil atualizado com sucesso!");
       }
 
       // --- STREAMING_CHUNK: Gestão de Disciplinas do Grupo de Farmácia... ---
@@ -1283,6 +1401,7 @@
         setNewSubjectName('');
       }
 
+      // --- STREAMING_CHUNK: Histórico e Registro Síncrono de Sessões... ---
       function handleRemoveSubject(id, name) {
         openConfirmModal(
           "Remover Disciplina", 
@@ -1309,7 +1428,6 @@
         );
       }
 
-      // --- STREAMING_CHUNK: Histórico e Registro Síncrono de Sessões... ---
       function handleDeleteSession(id) {
         openConfirmModal(
           "Excluir Registro", 
@@ -1427,7 +1545,6 @@
         setChatInput('');
       }
 
-      // --- STREAMING_CHUNK: Persistindo a data limite de fim de semestre... ---
       function handleSaveEndDate(newDate) {
         setEndDate(newDate);
         localStorage.setItem('study_countdown_endDate', newDate);
@@ -1644,11 +1761,27 @@
               if (activeProfile) {
                 const currentActiveDb = list.find(p => p.id === activeProfile.id);
                 if (currentActiveDb) {
-                  if (currentActiveDb.userMode && currentActiveDb.userMode !== selectedMode) {
-                    setSelectedMode(currentActiveDb.userMode);
+                  const dbMode = currentActiveDb.userMode;
+                  const dbColor = currentActiveDb.userColor;
+                  const localMode = localStorage.getItem(`study_mode_${activeProfile.id}`);
+                  const localColor = localStorage.getItem(`study_color_${activeProfile.id}`);
+
+                  if (localMode && dbMode !== localMode) {
+                    db.collection('artifacts').doc(appId).collection('public').doc('data').collection('participants').doc(activeProfile.id).set({
+                      userMode: localMode
+                    }, { merge: true }).catch(() => {});
+                  } else if (!localMode && dbMode) {
+                    setSelectedMode(dbMode);
+                    localStorage.setItem(`study_mode_${activeProfile.id}`, dbMode);
                   }
-                  if (currentActiveDb.userColor && currentActiveDb.userColor !== selectedColor) {
-                    setSelectedColor(currentActiveDb.userColor);
+
+                  if (localColor && dbColor !== localColor) {
+                    db.collection('artifacts').doc(appId).collection('public').doc('data').collection('participants').doc(activeProfile.id).set({
+                      userColor: localColor
+                    }, { merge: true }).catch(() => {});
+                  } else if (!localColor && dbColor) {
+                    setSelectedColor(dbColor);
+                    localStorage.setItem(`study_color_${activeProfile.id}`, dbColor);
                   }
                 }
               }
@@ -1713,7 +1846,7 @@
             localStorage.setItem('study_playlists_cache', JSON.stringify(list));
           });
 
-        // Listener de configurações globais (Data de Fim de Período)
+        // Listener de configurações globais
         const unsubSettings = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('countdown')
           .onSnapshot((doc) => {
             if (doc.exists && doc.data().endDate) {
@@ -1752,8 +1885,7 @@
       const completedMonths = useMemo(() => {
         const monthsSet = new Set();
         sessions.forEach(s => {
-          if (!s.startTime) return;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           const monthLabel = sDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
           const currentMonthLabel = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
           if (monthLabel.toLowerCase() !== currentMonthLabel.toLowerCase()) {
@@ -1790,32 +1922,48 @@
 
       const subjectStats = useMemo(() => {
         const subMap = {};
-        filteredSessions.forEach(s => {
-          const sId = s.subjectId || 'deleted';
-          if (!subMap[sId]) {
-            subMap[sId] = {
-              id: sId,
-              name: s.subjectName || 'Matéria Desconhecida',
-              color: s.subjectColor || '#94a3b8',
-              totalSeconds: 0
-            };
-          }
-          subMap[sId].totalSeconds += s.durationSeconds || 0;
+        
+        subjects.forEach(sub => {
+          subMap[sub.id] = {
+            id: sub.id,
+            name: sub.name,
+            color: sub.color || '#10b981',
+            totalSeconds: 0
+          };
         });
+
+        filteredSessions.forEach(s => {
+          const sId = s.subjectId;
+          if (sId && subMap[sId]) {
+            subMap[sId].totalSeconds += s.durationSeconds || 0;
+          } else {
+            const deletedId = sId || 'deleted';
+            if (!subMap[deletedId]) {
+              subMap[deletedId] = {
+                id: deletedId,
+                name: s.subjectName || 'Matéria Excluída',
+                color: s.subjectColor || '#94a3b8',
+                totalSeconds: 0
+              };
+            }
+            subMap[deletedId].totalSeconds += s.durationSeconds || 0;
+          }
+        });
+
         const totalSecsAll = Object.values(subMap).reduce((a, b) => a + b.totalSeconds, 0) || 1;
         const stats = Object.values(subMap).map(sub => ({
           ...sub,
           totalHours: parseFloat((sub.totalSeconds / 3600).toFixed(1)),
-          percentage: Math.round((sub.totalSeconds / totalSecsAll) * 100)
+          percentage: totalSecsAll > 1 ? Math.round((sub.totalSeconds / totalSecsAll) * 100) : 0
         }));
+        
         return stats.sort((a, b) => b.totalSeconds - a.totalSeconds);
-      }, [filteredSessions]);
+      }, [subjects, filteredSessions]);
 
       const groupMinutesToday = useMemo(() => {
         const todayStr = new Date().toDateString();
         const todaySessions = sessions.filter(s => {
-          if (!s.startTime) return false;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           return sDate.toDateString() === todayStr;
         });
         const secs = todaySessions.reduce((a, b) => a + (b.durationSeconds || 0), 0);
@@ -1831,8 +1979,7 @@
         if (filteredSessions.length === 0) return "0.0";
         const datesSet = new Set();
         filteredSessions.forEach(s => {
-          if (!s.startTime) return;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           datesSet.add(sDate.toDateString());
         });
         const numDays = datesSet.size || 1;
@@ -1840,7 +1987,6 @@
         return ((totalSecs / 3600) / numDays).toFixed(1);
       }, [filteredSessions]);
 
-      // --- STREAMING_CHUNK: Calculando Dias Faltantes e Prazos do Semestre... ---
       const daysRemaining = useMemo(() => {
         if (!endDate) return 0;
         try {
@@ -1861,35 +2007,35 @@
         return subjectStats[0].name;
       }, [subjectStats]);
 
-      // --- STREAMING_CHUNK: Renderizando as Módulos do React para Login e Preferências... ---
+      // --- STREAMING_CHUNK: Renderizando as Módulos do React para Login e Seleção de Perfil... ---
       const renderNetflixSelectScreen = () => {
         return (
-          <div className="min-h-screen bg-[#070709] flex flex-col items-center justify-center px-6 py-12 text-[#e2e8f0] font-sans animate-fade-in text-center w-full">
-            <div className="max-w-4xl w-full space-y-12">
-              <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 bg-emerald-950/40 text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/20 shadow-xl shadow-emerald-500/5">
-                  <PharmacyIcon className="w-9 h-9" />
+          <div className="min-h-screen bg-[#070709] flex flex-col items-center justify-center px-4 py-8 text-[#e2e8f0] font-sans animate-fade-in text-center w-full">
+            <div className="max-w-4xl w-full space-y-8 md:space-y-12">
+              <div className="space-y-3">
+                <div className="mx-auto w-14 h-14 bg-emerald-950/40 text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/20 shadow-xl shadow-emerald-500/5">
+                  <PharmacyIcon className="w-8 h-8" />
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white">
+                <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
                   Quem está estudando agora?
                 </h1>
-                <p className="text-slate-400 max-w-md mx-auto text-sm md:text-base font-medium">
+                <p className="text-slate-400 max-w-md mx-auto text-xs md:text-base font-medium">
                   Selecione o seu perfil para entrar na sala em tempo real de Farmácia.
                 </p>
               </div>
               
-              <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl mx-auto pt-4">
+              <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 max-w-4xl mx-auto pt-4">
                 {allProfilesList.map((p) => {
                   const mColor = MARKER_COLORS.find(c => c.id === p.markerColor) || MARKER_COLORS[0];
                   return (
                     <div key={p.id} className="group relative flex flex-col items-center">
-                      <div className="absolute top-2 right-2 z-10 flex gap-1 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl">
+                      <div className="absolute top-2 right-2 z-10 flex gap-1 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 shadow-xl">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             openExternalEditProfile(p);
                           }}
-                          className="p-1 hover:bg-slate-800 text-slate-300 hover:text-white rounded transition-colors border-none bg-transparent cursor-pointer"
+                          className="p-2 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg transition-colors border-none bg-transparent cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
                           title="Editar Perfil"
                         >
                           <Icon name="Edit3" className="w-4 h-4" />
@@ -1899,7 +2045,7 @@
                             e.stopPropagation();
                             handleDeleteProfilePreset(p.id);
                           }}
-                          className="p-1 hover:bg-rose-955 text-rose-400 hover:text-rose-300 rounded transition-colors border-none bg-transparent cursor-pointer"
+                          className="p-2 hover:bg-rose-950 text-rose-400 hover:text-rose-300 rounded-lg transition-colors border-none bg-transparent cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
                           title="Excluir Perfil"
                         >
                           <Icon name="Trash2" className="w-4 h-4" />
@@ -1914,10 +2060,10 @@
                         }}
                         className="focus:outline-none border-none bg-transparent cursor-pointer"
                       >
-                        <div className={`w-32 h-32 md:w-36 md:h-36 rounded-3xl bg-slate-900 border-4 border-transparent hover:scale-105 hover:${mColor.border} hover:shadow-xl hover:${mColor.glow} transition-all duration-300 flex items-center justify-center relative overflow-hidden p-6`}>
-                          {renderAvatar(p.avatar, "text-5xl md:text-6xl")}
+                        <div className={`w-28 h-28 md:w-36 md:h-36 rounded-3xl bg-slate-900 border-4 border-transparent hover:scale-105 hover:${mColor.border} hover:shadow-xl hover:${mColor.glow} transition-all duration-300 flex items-center justify-center relative overflow-hidden p-4`}>
+                          {renderAvatar(p.avatar, "text-4xl md:text-6xl")}
                         </div>
-                        <span className="mt-4 text-base md:text-lg font-semibold text-slate-400 group-hover:text-white transition-colors block text-center">
+                        <span className="mt-3 text-sm md:text-lg font-semibold text-slate-400 group-hover:text-white transition-colors block text-center">
                           {p.name}
                         </span>
                       </button>
@@ -1933,10 +2079,10 @@
                   }}
                   className="group flex flex-col items-center focus:outline-none border-none bg-transparent cursor-pointer"
                 >
-                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-3xl bg-slate-900/40 border-4 border-dashed border-slate-800 hover:border-slate-600 hover:scale-105 hover:bg-slate-900 hover:shadow-xl transition-all duration-300 flex items-center justify-center text-slate-600 group-hover:text-slate-400 p-6">
-                    <Icon name="Plus" className="w-12 h-12" />
+                  <div className="w-28 h-28 md:w-36 md:h-36 rounded-3xl bg-slate-900/40 border-4 border-dashed border-slate-800 hover:border-slate-600 hover:scale-105 hover:bg-slate-900 hover:shadow-xl transition-all duration-300 flex items-center justify-center text-slate-600 group-hover:text-slate-400 p-4">
+                    <Icon name="Plus" className="w-10 h-10" />
                   </div>
-                  <span className="mt-4 text-base md:text-lg font-semibold text-slate-500 group-hover:text-slate-300 transition-colors block text-center">
+                  <span className="mt-3 text-sm md:text-lg font-semibold text-slate-500 group-hover:text-slate-300 transition-colors block text-center">
                     Criar Perfil
                   </span>
                 </button>
@@ -1949,8 +2095,8 @@
       const renderLoginScreen = () => {
         const isSigningIn = isLoggingIn;
         return (
-          <div className="min-h-screen bg-[#0b0b0d] flex flex-col items-center justify-center px-6 py-12 text-slate-100 font-sans animate-fade-in text-center w-full" style={activeThemeObj.variables}>
-            <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 text-left relative font-sans font-semibold">
+          <div className="min-h-screen bg-[#0b0b0d] flex flex-col items-center justify-center px-4 py-8 text-slate-100 font-sans animate-fade-in text-center w-full" style={activeThemeObj.variables}>
+            <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 text-left relative font-sans font-semibold">
               <button 
                 onClick={() => setTempProfileSelected(null)}
                 className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors border-none bg-transparent cursor-pointer text-xs font-bold font-sans"
@@ -1959,10 +2105,10 @@
               </button>
               
               <div className="text-center space-y-2 animate-none">
-                <div className="inline-flex w-16 h-16 rounded-full bg-slate-800 border border-slate-800 items-center justify-center text-4xl mb-2 select-none shadow-md">
+                <div className="inline-flex w-14 h-14 rounded-full bg-slate-800 border border-slate-800 items-center justify-center text-3xl mb-1 select-none shadow-md">
                   {tempProfileSelected.avatar}
                 </div>
-                <h2 className="text-2xl font-black text-white font-sans">Olá, {tempProfileSelected.name}!</h2>
+                <h2 className="text-xl md:text-2xl font-black text-white font-sans">Olá, {tempProfileSelected.name}!</h2>
                 <p className="text-xs text-slate-400 font-sans">Informe suas credenciais para liberar o painel.</p>
               </div>
               {loginError && (
@@ -1997,7 +2143,7 @@
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors border-none bg-transparent cursor-pointer p-1"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors border-none bg-transparent cursor-pointer p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
                       title={showPassword ? "Ocultar senha" : "Ver senha"}
                     >
                       {showPassword ? (
@@ -2011,7 +2157,7 @@
                 <button
                   type="submit"
                   disabled={isSigningIn}
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10 focus:outline-none border-none cursor-pointer text-sm"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10 focus:outline-none border-none cursor-pointer text-sm min-h-[44px]"
                 >
                   {isSigningIn ? 'A autenticar no Firebase...' : 'Entrar no Painel'}
                 </button>
@@ -2041,8 +2187,7 @@
         }
         
         personalSessions.forEach(s => {
-          if (!s.startTime) return;
-          const sDate = s.startTime.toDate ? s.startTime.toDate() : new Date(s.startTime);
+          const sDate = safeParseDate(s.startTime);
           const match = last7Days.find(d => d.dateStr === sDate.toDateString());
           if (match) {
             match.hours += (s.durationSeconds || 0) / 3600;
@@ -2055,7 +2200,7 @@
 
         const maxDayHours = Math.max(...last7Days.map(d => d.hours), 1);
 
-        // --- CÁLCULO DA DIVISÃO POR DISCIPLINA (EXIBINDO TODAS) ---
+        // --- CÁLCULO DA DIVISÃO POR DISCIPLINA ---
         const personalBySubject = {};
         subjects.forEach(sub => {
           personalBySubject[sub.id] = { 
@@ -2091,22 +2236,22 @@
         });
 
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left h-full">
             {/* ESTATÍSTICAS DO ESTUDANTE */}
             <div className="lg:col-span-5 space-y-6">
               {/* CARD: CONQUISTAS */}
-              <div className="theme-bg-card border theme-border rounded-3xl p-6 shadow-sm">
-                <h3 className="font-bold text-lg theme-text-main mb-4 flex items-center gap-2">
+              <div className="theme-bg-card border theme-border rounded-3xl p-5 md:p-6 shadow-sm">
+                <h3 className="font-bold text-base md:text-lg theme-text-main mb-4 flex items-center gap-2">
                   <Icon name="Award" className="w-5 h-5 text-emerald-400" /> Suas Conquistas
                 </h3>
-                <div className="grid grid-cols-2 gap-4 text-center mb-6">
-                  <div className="theme-bg-input border theme-border p-4 rounded-2xl">
-                    <span className="text-xs theme-text-muted block font-semibold">Horas de Estudo</span>
-                    <strong className="text-3xl font-black theme-text-accent block mt-1">{uStats.totalHours}h</strong>
+                <div className="grid grid-cols-2 gap-3 md:gap-4 text-center mb-6">
+                  <div className="theme-bg-input border theme-border p-3 md:p-4 rounded-2xl">
+                    <span className="text-[10px] md:text-xs theme-text-muted block font-semibold">Horas de Estudo</span>
+                    <strong className="text-2xl md:text-3xl font-black theme-text-accent block mt-1">{uStats.totalHours}h</strong>
                   </div>
-                  <div className="theme-bg-input border theme-border p-4 rounded-2xl">
-                    <span className="text-xs theme-text-muted block font-semibold">Sessões Focadas</span>
-                    <strong className="text-3xl font-black theme-text-accent block mt-1">{uStats.sessionCount}</strong>
+                  <div className="theme-bg-input border theme-border p-3 md:p-4 rounded-2xl">
+                    <span className="text-[10px] md:text-xs theme-text-muted block font-semibold">Sessões Focadas</span>
+                    <strong className="text-2xl md:text-3xl font-black theme-text-accent block mt-1">{uStats.sessionCount}</strong>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -2130,24 +2275,24 @@
               </div>
 
               {/* CARD: GRÁFICO DE HORAS SEMANAIS (BARRAS) */}
-              <div className="theme-bg-card border theme-border rounded-3xl p-6 shadow-sm">
-                <h3 className="font-bold text-lg theme-text-main mb-2 flex items-center gap-2">
+              <div className="theme-bg-card border theme-border rounded-3xl p-5 md:p-6 shadow-sm">
+                <h3 className="font-bold text-base md:text-lg theme-text-main mb-2 flex items-center gap-2">
                   <Icon name="BarChart3" className="w-5 h-5 theme-text-accent" /> Foco Semanal
                 </h3>
                 <p className="theme-text-muted text-xs mb-4">Seu rendimento diário nas últimas 7 datas.</p>
-                <div className="flex justify-between items-end h-40 pt-4 px-2 theme-bg-input border theme-border rounded-2xl">
+                <div className="flex justify-between items-end h-36 md:h-40 pt-4 px-2 theme-bg-input border theme-border rounded-2xl">
                   {last7Days.map((day, i) => {
-                    const barHeight = day.hours > 0 ? `${(day.hours / maxDayHours) * 80}%` : '4px';
+                    const barHeight = day.hours > 0 ? `${(day.hours / maxDayHours) * 75}%` : '4px';
                     return (
-                      <div key={i} className="flex flex-col items-center flex-1 group">
-                        <span className="text-[10px] font-bold theme-text-accent opacity-0 group-hover:opacity-100 transition-opacity duration-200 mb-1">
+                      <div key={i} className="flex flex-col items-center justify-end flex-1 h-full group">
+                        <span className="text-[9px] md:text-[10px] font-bold theme-text-accent mb-1 transition-all duration-300">
                           {day.hours}h
                         </span>
                         <div 
-                          className="w-5 sm:w-6 theme-bg-accent rounded-t-md transition-all duration-500 shadow-sm shadow-emerald-500/10 hover:brightness-110"
+                          className="w-4 sm:w-6 theme-bg-accent rounded-t-md transition-all duration-500 ease-out shadow-sm shadow-emerald-500/10 hover:brightness-110"
                           style={{ height: barHeight }}
                         ></div>
-                        <span className="text-[9px] theme-text-muted font-black uppercase mt-2 tracking-wider">
+                        <span className="text-[8px] md:text-[9px] theme-text-muted font-black uppercase mt-2 tracking-wider">
                           {day.label}
                         </span>
                       </div>
@@ -2156,9 +2301,9 @@
                 </div>
               </div>
 
-              {/* CARD: DIVISÃO POR DISCIPLINA (EXIBINDO TODAS) */}
-              <div className="theme-bg-card border theme-border rounded-3xl p-6 shadow-sm">
-                <h3 className="font-bold text-lg theme-text-main mb-4">Divisão Pessoal por Disciplina</h3>
+              {/* CARD: DIVISÃO POR DISCIPLINA */}
+              <div className="theme-bg-card border theme-border rounded-3xl p-5 md:p-6 shadow-sm">
+                <h3 className="font-bold text-base md:text-lg theme-text-main mb-4">Divisão Pessoal por Disciplina</h3>
                 <div className="space-y-4">
                   {personalStatsArr.length === 0 ? (
                     <p className="text-slate-500 text-xs py-8 text-center">Nenhuma matéria cadastrada.</p>
@@ -2183,13 +2328,13 @@
             </div>
 
             {/* LISTA DE AFAZERES (TO-DO) */}
-            <div className="lg:col-span-7 theme-bg-card border theme-border rounded-3xl p-6 shadow-sm flex flex-col h-full min-h-[500px]">
-              <div className="flex items-center justify-between border-b theme-border pb-4 mb-4">
+            <div className="lg:col-span-7 theme-bg-card border theme-border rounded-3xl p-5 md:p-6 shadow-sm flex flex-col h-full min-h-[400px]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b theme-border pb-4 mb-4">
                 <div>
-                  <h3 className="font-bold text-lg theme-text-main">Bloco de Tarefas Pessoal</h3>
+                  <h3 className="font-bold text-base md:text-lg theme-text-main">Bloco de Tarefas Pessoal</h3>
                   <p className="theme-text-muted text-xs">Organize seus compromissos e prioridades de estudo.</p>
                 </div>
-                <div className="flex gap-1.5 bg-slate-950/20 p-1 rounded-xl border theme-border">
+                <div className="flex gap-1 bg-slate-950/20 p-1 rounded-xl border theme-border self-start">
                   {[
                     { id: 'all', label: 'Tudo' },
                     { id: 'pending', label: 'Pendentes' },
@@ -2198,7 +2343,7 @@
                     <button
                       key={f.id}
                       onClick={() => setTodoFilter(f.id)}
-                      className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${todoFilter === f.id ? 'theme-bg-accent text-white' : 'theme-text-muted hover:theme-text-main bg-transparent'}`}
+                      className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all min-h-[36px] flex items-center justify-center ${todoFilter === f.id ? 'theme-bg-accent text-white' : 'theme-text-muted hover:theme-text-main bg-transparent'}`}
                     >
                       {f.label}
                     </button>
@@ -2206,33 +2351,35 @@
                 </div>
               </div>
 
-              <form onSubmit={handleAddTodo} className="flex gap-2 mb-4">
+              <form onSubmit={handleAddTodo} className="flex flex-col sm:flex-row gap-2 mb-4">
                 <input
                   type="text"
                   required
                   placeholder="Nova tarefa de estudos..."
                   value={todoInput}
                   onChange={e => setTodoInput(e.target.value)}
-                  className="flex-1 border theme-border rounded-xl px-4 py-2 text-xs focus:outline-none theme-bg-input theme-text-main"
+                  className="flex-1 border theme-border rounded-xl px-4 py-3 sm:py-2 text-xs focus:outline-none theme-bg-input theme-text-main min-h-[44px]"
                 />
-                <select
-                  value={todoSelectedSubjectId}
-                  onChange={e => setTodoSelectedSubjectId(e.target.value)}
-                  className="border theme-border rounded-xl px-3 py-2 text-xs theme-bg-input theme-text-main focus:outline-none max-w-[150px]"
-                >
-                  {subjects.map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-                <button
-                  type="submit"
-                  className="theme-bg-accent theme-bg-accent-hover text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors border-none cursor-pointer"
-                >
-                  Criar
-                </button>
+                <div className="flex gap-2">
+                  <select
+                    value={todoSelectedSubjectId}
+                    onChange={e => setTodoSelectedSubjectId(e.target.value)}
+                    className="flex-1 border theme-border rounded-xl px-3 py-3 sm:py-2 text-xs theme-bg-input theme-text-main focus:outline-none min-h-[44px]"
+                  >
+                    {subjects.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="submit"
+                    className="theme-bg-accent theme-bg-accent-hover text-white px-5 py-3 sm:py-2 rounded-xl text-xs font-bold transition-colors border-none cursor-pointer min-h-[44px]"
+                  >
+                    Criar
+                  </button>
+                </div>
               </form>
 
-              <div className="flex-1 overflow-y-auto space-y-2 max-h-[340px] pr-2 scrollbar-thin">
+              <div className="flex-1 overflow-y-auto space-y-2 max-h-[340px] pr-1 scrollbar-thin">
                 {filteredTodos.length === 0 ? (
                   <div className="text-center py-12 theme-text-muted">
                     <p className="text-xs">Nenhuma tarefa encontrada neste filtro.</p>
@@ -2246,7 +2393,7 @@
                           type="checkbox"
                           checked={todo.completed}
                           onChange={() => handleToggleTodo(todo.id, todo.completed)}
-                          className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                          className="w-5 h-5 sm:w-4 sm:h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                         />
                         <div className="min-w-0">
                           <p className={`text-xs font-semibold truncate ${todo.completed ? 'line-through theme-text-muted' : 'theme-text-main'}`}>
@@ -2263,7 +2410,7 @@
                       <button
                         type="button"
                         onClick={() => handleDeleteTodo(todo.id)}
-                        className="p-1 text-slate-500 hover:text-rose-500 transition-colors bg-transparent border-none cursor-pointer"
+                        className="p-2 text-slate-500 hover:text-rose-500 transition-colors bg-transparent border-none cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
                         title="Deletar Tarefa"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -2286,18 +2433,43 @@
         return renderLoginScreen();
       }
 
-      // --- STREAMING_CHUNK: Retorno Principal da Interface Geral do App... ---
+      // --- STREAMING_CHUNK: Retornando o Layout Geral unificado com correções de estrutura e tags adjacentes... ---
       return (
-        <div className="h-screen w-screen font-sans flex flex-col lg:flex-row relative transition-all duration-300 theme-bg-main theme-text-main overflow-hidden" style={activeThemeObj.variables}>
+        <div className="min-h-screen lg:h-screen w-screen font-sans flex flex-col lg:flex-row relative transition-all duration-300 theme-bg-main theme-text-main overflow-x-hidden lg:overflow-hidden pb-16 lg:pb-0" style={activeThemeObj.variables}>
           {localNotification && (
             <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-slate-900 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold animate-bounce">
               <span>✨</span> {localNotification}
             </div>
           )}
 
-          {/* MENU LATERAL ESQUERDO (SIDEBAR ROLÁVEL) */}
-          <aside className="w-full lg:w-72 theme-bg-sidebar border-b lg:border-b-0 lg:border-r theme-border flex flex-col justify-between shrink-0 h-auto lg:h-full z-20 text-left overflow-hidden transition-all duration-300">
-            {/* PARTE ROLÁVEL DA SIDEBAR */}
+          {/* CABEÇALHO MOBILE (STICKY TOP BAR) */}
+          <header className="lg:hidden sticky top-0 h-14 theme-bg-sidebar border-b theme-border flex items-center justify-between px-4 z-40 backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 rounded-lg theme-bg-input theme-text-accent font-semibold flex items-center justify-center">
+                <PharmacyIcon className="w-5 h-5" />
+              </span>
+              <h1 className="font-extrabold text-sm tracking-tight theme-text-main">Farmácia</h1>
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+            </div>
+            
+            {activeProfile && (
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  className="p-2 hover:bg-slate-800/10 theme-text-muted hover:theme-text-main rounded-lg transition-colors border-none bg-transparent cursor-pointer min-w-[36px] min-h-[36px]"
+                  title="Configurações e Menu"
+                >
+                  <MenuIcon className="w-5 h-5" />
+                </button>
+                <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center border theme-border overflow-hidden select-none text-base">
+                  {activeProfile.avatar}
+                </div>
+              </div>
+            )}
+          </header>
+
+          {/* MENU LATERAL ESQUERDO (DESKTOP ONLY) */}
+          <aside className="hidden lg:flex w-full lg:w-72 theme-bg-sidebar border-b lg:border-b-0 lg:border-r theme-border flex-col justify-between shrink-0 h-auto lg:h-full z-20 text-left overflow-hidden transition-all duration-300">
             <div className="flex-grow overflow-y-auto scrollbar-thin flex flex-col justify-between pb-4">
               <div>
                 <div className="p-6 border-b theme-border flex items-center justify-between">
@@ -2330,7 +2502,7 @@
                     <button 
                       onClick={() => openExternalEditProfile(activeProfile)}
                       title="Editar Perfil"
-                      className="p-1.5 hover:bg-slate-800/10 theme-text-muted hover:theme-text-main rounded-lg transition-colors border-none bg-transparent cursor-pointer"
+                      className="p-1.5 hover:bg-slate-800/10 theme-text-muted hover:theme-text-main rounded-lg transition-colors border-none bg-transparent cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
                     >
                       <Icon name="Edit3" className="w-4 h-4 theme-text-accent" />
                     </button>
@@ -2396,7 +2568,7 @@
                     {[
                       { id: 'azul', name: 'Azul', hex: '#3b82f6' },
                       { id: 'lilas', name: 'Lilás', hex: '#a855f7' },
-                      { id: 'cafe', name: 'Café', hex: '#92400e' },
+                      { id: 'cafe', name: 'Bege', hex: '#dfb982' },
                       { id: 'verde', name: 'Verde', hex: '#10b981' },
                       { id: 'vermelho', name: 'Vinho', hex: '#f43f5e' },
                       { id: 'teal', name: 'Teal', hex: '#14b8a6' }
@@ -2416,7 +2588,6 @@
               </div>
             </div>
 
-            {/* RODAPÉ ESTÁTICO DA SIDEBAR */}
             <div className="p-4 border-t border-slate-800 bg-slate-900/10 flex flex-col gap-2 shrink-0">
               <button
                 onClick={() => setIsChatOpen(!isChatOpen)}
@@ -2437,7 +2608,7 @@
                 </div>
                 <button 
                   onClick={handleSignOut}
-                  className="flex items-center gap-1.5 text-xs theme-text-accent font-semibold uppercase tracking-wider transition-colors border-none bg-transparent cursor-pointer"
+                  className="flex items-center gap-1.5 text-xs theme-text-accent font-semibold uppercase tracking-wider transition-colors border-none bg-transparent cursor-pointer min-h-[36px] flex items-center"
                 >
                   Sair <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -2445,8 +2616,8 @@
             </div>
           </aside>
           
-          {/* PAINEL CENTRAL DE CONTEÚDO (ROLAGEM INDEPENDENTE) */}
-          <main className="flex-grow h-full overflow-y-auto scrollbar-thin p-6 lg:p-10 space-y-8 max-w-7xl mx-auto w-full">
+          {/* PAINEL CENTRAL DE CONTEÚDO */}
+          <main className="flex-grow h-full overflow-y-auto scrollbar-thin p-4 md:p-6 lg:p-10 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full">
             {apiDisabledError && (
               <div className="bg-amber-955/20 border border-amber-500/20 rounded-xl p-4 flex gap-3 text-sm text-amber-300">
                 <div className="bg-amber-955 p-1 rounded-lg shrink-0">
@@ -2464,11 +2635,11 @@
                 <h2 className="text-2xl lg:text-3xl font-extrabold tracking-tight theme-text-main">
                   Olá, {activeProfile?.name || 'Estudante'}!
                 </h2>
-                <p className="theme-text-muted mt-1">Bem-vindo à sala de estudos em tempo real de Farmácia.</p>
+                <p className="theme-text-muted mt-1 text-xs md:text-sm">Bem-vindo à sala de estudos em tempo real de Farmácia.</p>
               </div>
-              <div className="flex items-center gap-2 theme-bg-card border theme-border rounded-2xl px-4 py-3">
+              <div className="flex items-center gap-2 theme-bg-card border theme-border rounded-2xl px-4 py-3 self-start md:self-auto">
                 <Icon name="Users" className="w-5 h-5 text-emerald-400" />
-                <span className="text-sm font-semibold theme-text-main">
+                <span className="text-xs md:text-sm font-semibold theme-text-main">
                   {activeParticipantsList.filter(p => isParticipantOnline(p)).length} ativos agora
                 </span>
                 <span className="text-slate-500 px-1">|</span>
@@ -2478,32 +2649,32 @@
 
             {/* ABA: PAINEL GERAL (DASHBOARD) */}
             {activeTab === 'dashboard' && (
-              <div className="space-y-8 text-left animate-fade-in">
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 theme-bg-card border theme-border rounded-2xl">
-                  <div className="flex gap-2">
+              <div className="space-y-6 md:space-y-8 text-left animate-fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 theme-bg-card border theme-border rounded-2xl">
+                  <div className="flex flex-wrap gap-1.5">
                     {[
-                      { id: 'semanal', label: 'Ranking Semanal ⏱️' },
+                      { id: 'semanal', label: 'Semanal ⏱️' },
                       { id: 'mensal', label: 'Mês Ativo 📅' },
-                      { id: 'mensal-passado', label: 'Histórico de Meses 🏛️' },
-                      { id: 'geral', label: 'Acumulado Geral 🏆' }
+                      { id: 'mensal-passado', label: 'Histórico 🏛️' },
+                      { id: 'geral', label: 'Geral 🏆' }
                     ].map(f => (
                       <button
                         key={f.id}
                         type="button"
                         onClick={() => setRankingFilter(f.id)}
-                        className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${rankingFilter === f.id ? 'theme-bg-accent text-white shadow-md' : 'theme-text-muted hover:bg-black/10 bg-transparent'} cursor-pointer`}
+                        className={`text-xs font-bold px-3 py-2 rounded-xl transition-all min-h-[38px] ${rankingFilter === f.id ? 'theme-bg-accent text-white shadow-md' : 'theme-text-muted hover:bg-black/10 bg-transparent'} cursor-pointer`}
                       >
                         {f.label}
                       </button>
                     ))}
                   </div>
                   {rankingFilter === 'mensal-passado' && completedMonths.length > 0 && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
                       <span className="text-xs theme-text-muted">Mês:</span>
                       <select
                         value={selectedPastMonth}
                         onChange={e => setSelectedPastMonth(e.target.value)}
-                        className="border border-slate-500/15 text-xs rounded-lg px-2 py-1 focus:outline-none theme-bg-input theme-text-main font-semibold"
+                        className="border border-slate-500/15 text-xs rounded-lg px-2 py-1.5 focus:outline-none theme-bg-input theme-text-main font-semibold min-h-[36px]"
                       >
                         {completedMonths.map(m => (
                           <option key={m} value={m}>{m}</option>
@@ -2514,32 +2685,32 @@
                 </div>
 
                 {/* GRID DE MÉTRICAS GERAIS */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* CARD: FIM DO PERÍODO */}
-                  <div className="theme-bg-card border theme-border p-5 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden h-36">
+                  <div className="theme-bg-card border theme-border p-4 md:p-5 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden h-32 md:h-36 col-span-2 sm:col-span-1">
                     <div className="flex justify-between items-start">
-                      <span className="text-xs theme-text-muted uppercase tracking-wider font-semibold">Faltam</span>
+                      <span className="text-[10px] md:text-xs theme-text-muted uppercase tracking-wider font-semibold">Faltam</span>
                       {isEditingEndDate ? (
                         <div className="absolute inset-0 bg-slate-900 border border-slate-700 rounded-2xl p-3 flex flex-col justify-between z-20 animate-fade-in text-white">
-                          <label className="text-[10px] text-slate-300 font-bold uppercase block mb-1">Nova Data Limite</label>
+                          <label className="text-[9px] text-slate-300 font-bold uppercase block">Nova Data</label>
                           <input 
                             type="date"
                             value={tempEndDate}
                             onChange={(e) => setTempEndDate(e.target.value)}
-                            className="bg-slate-950 border border-slate-700 text-white rounded-lg p-1 text-xs focus:outline-none w-full"
+                            className="bg-slate-950 border border-slate-700 text-white rounded-lg p-1.5 text-xs focus:outline-none w-full min-h-[36px]"
                           />
                           <div className="flex justify-end gap-2 mt-2 w-full">
                             <button 
                               type="button" 
                               onClick={() => setIsEditingEndDate(false)}
-                              className="text-[10px] text-rose-400 font-bold hover:text-rose-300 cursor-pointer bg-transparent border-none"
+                              className="text-[10px] text-rose-400 font-bold hover:text-rose-300 cursor-pointer bg-transparent border-none min-h-[36px] px-2"
                             >
                               Cancelar
                             </button>
                             <button 
                               type="button" 
                               onClick={() => handleSaveEndDate(tempEndDate)}
-                              className="text-[10px] text-emerald-400 font-bold hover:text-emerald-300 cursor-pointer bg-transparent border-none"
+                              className="text-[10px] text-emerald-400 font-bold hover:text-emerald-300 cursor-pointer bg-transparent border-none min-h-[36px] px-2"
                             >
                               Salvar
                             </button>
@@ -2552,7 +2723,7 @@
                             setTempEndDate(endDate);
                             setIsEditingEndDate(true);
                           }}
-                          className="p-1 hover:bg-slate-800/40 text-slate-400 hover:text-white rounded-lg transition-colors border-none bg-transparent cursor-pointer"
+                          className="p-2 hover:bg-slate-800/40 text-slate-400 hover:text-white rounded-lg transition-colors border-none bg-transparent cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
                           title="Alterar Data Final"
                         >
                           <Icon name="Edit3" className="w-3.5 h-3.5" />
@@ -2561,71 +2732,71 @@
                     </div>
                     
                     <div className="text-center">
-                      <h3 className="text-5xl font-black theme-text-accent tracking-tighter leading-none animate-pulse">
+                      <h3 className="text-4xl md:text-5xl font-black theme-text-accent tracking-tighter leading-none animate-pulse">
                         {daysRemaining}
                       </h3>
-                      <span className="text-xs theme-text-muted font-bold block mt-1 uppercase tracking-widest">dias</span>
+                      <span className="text-[10px] md:text-xs theme-text-muted font-bold block mt-1 uppercase tracking-widest">dias</span>
                     </div>
                     
-                    <div className="text-left border-t border-slate-800/30 pt-1 flex justify-between text-[10px] theme-text-muted">
-                      <span className="font-bold">Fim do Período</span>
+                    <div className="text-left border-t border-slate-800/30 pt-1 flex justify-between text-[9px] md:text-[10px] theme-text-muted">
+                      <span className="font-bold">Fim</span>
                       <span>{endDate ? new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'}) : '--/--'}</span>
                     </div>
                   </div>
 
                   {/* CARD: TOTAL DO GRUPO */}
-                  <div className="theme-bg-card border theme-border p-5 rounded-2xl flex flex-col justify-between shadow-sm h-36">
+                  <div className="theme-bg-card border theme-border p-4 md:p-5 rounded-2xl flex flex-col justify-between shadow-sm h-32 md:h-36">
                     <div className="flex justify-between items-start">
-                      <p className="text-xs theme-text-muted uppercase tracking-wider font-semibold">Total do Grupo</p>
-                      <span className="p-1.5 theme-bg-accent-muted rounded-lg"><Clock className="w-4 h-4 text-sky-400" /></span>
+                      <p className="text-[10px] md:text-xs theme-text-muted uppercase tracking-wider font-semibold">Total Coletivo</p>
+                      <span className="p-1 theme-bg-accent-muted rounded-lg"><Clock className="w-3.5 h-3.5 text-sky-400" /></span>
                     </div>
                     <div className="text-left">
-                      <h3 className="text-4xl font-black theme-text-main">{totalGroupHours}h</h3>
+                      <h3 className="text-3xl md:text-4xl font-black theme-text-main">{totalGroupHours}h</h3>
                     </div>
-                    <p className="text-[10px] theme-text-muted border-t border-slate-800/30 pt-1">Estudados coletivamente</p>
+                    <p className="text-[9px] md:text-[10px] theme-text-muted border-t border-slate-800/30 pt-1">Horas dedicadas</p>
                   </div>
 
                   {/* CARD: LÍDER DO PERÍODO */}
-                  <div className="theme-bg-card border theme-border p-5 rounded-2xl flex flex-col justify-between shadow-sm h-36">
+                  <div className="theme-bg-card border theme-border p-4 md:p-5 rounded-2xl flex flex-col justify-between shadow-sm h-32 md:h-36">
                     <div className="flex justify-between items-start">
-                      <p className="text-xs theme-text-muted uppercase tracking-wider font-semibold">Líder do Período</p>
-                      <span className="p-1.5 theme-bg-accent-muted rounded-lg"><Icon name="Trophy" className="w-4 h-4 text-yellow-500" /></span>
+                      <p className="text-[10px] md:text-xs theme-text-muted uppercase tracking-wider font-semibold">Líder</p>
+                      <span className="p-1 theme-bg-accent-muted rounded-lg"><Icon name="Trophy" className="w-3.5 h-3.5 text-yellow-500" /></span>
                     </div>
                     <div className="text-left">
-                      <h3 className="text-2xl font-black truncate max-w-[150px] theme-text-main">
+                      <h3 className="text-lg md:text-2xl font-black truncate max-w-[110px] md:max-w-[150px] theme-text-main">
                         {leaderParticipant ? leaderParticipant.name : 'Nenhum'}
                       </h3>
                     </div>
-                    <p className="text-[10px] theme-text-muted border-t border-slate-800/30 pt-1">
-                      {leaderParticipant ? `${leaderParticipant.totalHours} horas dedicadas` : 'Sem sessões'}
+                    <p className="text-[9px] md:text-[10px] theme-text-muted border-t border-slate-800/30 pt-1">
+                      {leaderParticipant ? `${leaderParticipant.totalHours} horas` : 'Sem foco'}
                     </p>
                   </div>
 
                   {/* CARD: MÉDIA DIÁRIA COLETIVA */}
-                  <div className="theme-bg-card border theme-border p-5 rounded-2xl flex flex-col justify-between shadow-sm h-36">
+                  <div className="theme-bg-card border theme-border p-4 md:p-5 rounded-2xl flex flex-col justify-between shadow-sm h-32 md:h-36">
                     <div className="flex justify-between items-start">
-                      <p className="text-xs theme-text-muted uppercase tracking-wider font-semibold">Média Diária Coletiva</p>
-                      <span className="p-1.5 theme-bg-accent-muted rounded-lg"><Target className="w-4 h-4 text-rose-500" /></span>
+                      <p className="text-[10px] md:text-xs theme-text-muted uppercase tracking-wider font-semibold">Média Diária</p>
+                      <span className="p-1 theme-bg-accent-muted rounded-lg"><Target className="w-3.5 h-3.5 text-rose-500" /></span>
                     </div>
                     <div className="text-left">
-                      <h3 className="text-4xl font-black theme-text-main">{groupDailyAverage}h</h3>
+                      <h3 className="text-3xl md:text-4xl font-black theme-text-main">{groupDailyAverage}h</h3>
                     </div>
-                    <p className="text-[10px] theme-text-muted border-t border-slate-800/30 pt-1">Com base no filtro selecionado</p>
+                    <p className="text-[9px] md:text-[10px] theme-text-muted border-t border-slate-800/30 pt-1">Com base no filtro</p>
                   </div>
                 </div>
 
                 {/* META DIÁRIA DO GRUPO */}
-                <div className="theme-bg-card border theme-border rounded-2xl p-6 shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-lg theme-text-main flex items-center gap-2">
+                <div className="theme-bg-card border theme-border rounded-2xl p-5 md:p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <h3 className="font-bold text-base md:text-lg theme-text-main flex items-center gap-2">
                       <Icon name="Flame" className="w-5 h-5 text-orange-500 animate-pulse" /> Meta Diária do Grupo (Hoje)
                     </h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
                       <span className="text-xs theme-text-muted">Meta:</span>
                       <select 
                         value={metaDiaria} 
                         onChange={(e) => setMetaDiaria(Number(e.target.value))}
-                        className="border border-slate-500/15 text-xs rounded-lg px-2 py-1 focus:outline-none theme-bg-input theme-text-main font-semibold"
+                        className="border border-slate-500/15 text-xs rounded-lg px-2 py-1.5 focus:outline-none theme-bg-input theme-text-main font-semibold min-h-[36px]"
                       >
                         <option value={60}>1 hora (60 min)</option>
                         <option value={120}>2 horas (120 min)</option>
@@ -2634,38 +2805,38 @@
                       </select>
                     </div>
                   </div>
-                  <div className="theme-bg-input border theme-border rounded-full h-4 relative overflow-hidden">
+                  <div className="theme-bg-input border theme-border rounded-full h-3.5 relative overflow-hidden">
                     <div 
                       className="h-full transition-all duration-500 theme-bg-accent" 
                       style={{ width: `${metaPercentage}%` }}
                     ></div>
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <span className="text-sm theme-text-muted">
+                    <span className="text-xs md:text-sm theme-text-muted">
                       Grupo estudou: <strong className="theme-text-accent">{groupMinutesToday} min</strong> hoje
                     </span>
-                    <span className="text-sm font-semibold theme-text-accent">{metaPercentage}% atingido</span>
+                    <span className="text-xs md:text-sm font-semibold theme-text-accent">{metaPercentage}% atingido</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* DIVISÃO POR MATÉRIA */}
-                  <div className="theme-bg-card border theme-border rounded-3xl p-6 shadow-sm">
-                    <h3 className="font-bold text-base mb-4 theme-text-main">Divisão de Estudos por Matéria</h3>
+                  <div className="theme-bg-card border theme-border rounded-3xl p-5 md:p-6 shadow-sm">
+                    <h3 className="font-bold text-sm md:text-base mb-4 theme-text-main">Divisão de Estudos por Matéria</h3>
                     <div className="space-y-4">
                       {subjectStats.length === 0 ? (
-                        <p className="text-slate-500 text-sm py-8 text-center">Nenhum dado registrado para gerar estatísticas neste filtro.</p>
+                        <p className="text-slate-500 text-xs py-8 text-center">Nenhum dado registrado para gerar estatísticas neste filtro.</p>
                       ) : (
                         subjectStats.map((sub) => (
                           <div key={sub.id} className="space-y-1">
                             <div className="flex justify-between text-xs font-semibold">
                               <span className="flex items-center gap-1.5 theme-text-main">
-                                <span className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: sub.color }}></span>
+                                <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: sub.color }}></span>
                                 {sub.name}
                               </span>
                               <span className="theme-text-muted">{sub.totalHours}h ({sub.percentage}%)</span>
                             </div>
-                            <div className="w-full theme-bg-input rounded-full h-2">
+                            <div className="w-full theme-bg-input rounded-full h-1.5">
                               <div 
                                 className="h-full rounded-full transition-all duration-300"
                                 style={{ width: `${sub.percentage}%`, backgroundColor: sub.color }}
@@ -2678,11 +2849,11 @@
                   </div>
 
                   {/* PARTICIPAÇÃO NO FILTRO */}
-                  <div className="theme-bg-card border theme-border rounded-3xl p-6 shadow-sm">
-                    <h3 className="font-bold text-base mb-4 theme-text-main font-semibold">Estatísticas de Participação (Filtro Ativo)</h3>
+                  <div className="theme-bg-card border theme-border rounded-3xl p-5 md:p-6 shadow-sm">
+                    <h3 className="font-bold text-sm md:text-base mb-4 theme-text-main">Estatísticas de Participação (Filtro Ativo)</h3>
                     <div className="space-y-4">
                       {participantStats.length === 0 ? (
-                        <p className="text-slate-500 text-sm py-8 text-center">Aguardando novos participantes.</p>
+                        <p className="text-slate-500 text-xs py-8 text-center">Aguardando novos participantes.</p>
                       ) : (
                         participantStats.map((p) => {
                           const maxHours = Math.max(...participantStats.map(ps => ps.totalHours)) || 1;
@@ -2692,12 +2863,12 @@
                             <div key={p.id} className="space-y-1">
                               <div className="flex justify-between text-xs font-semibold">
                                 <div className="flex items-center">
-                                  {renderAvatar(p.avatar, "text-lg")}
+                                  {renderAvatar(p.avatar, "text-base")}
                                   <span className="ml-1.5 theme-text-main">{p.name}</span>
                                 </div>
                                 <span className="theme-text-muted">{p.totalHours} horas</span>
                               </div>
-                              <div className="w-full theme-bg-input rounded-full h-2">
+                              <div className="w-full theme-bg-input rounded-full h-1.5">
                                 <div 
                                   className={`h-full rounded-full transition-all duration-300 ${colorObj.bg}`}
                                   style={{ width: `${percentOfMax}%` }}
@@ -2711,14 +2882,14 @@
                   </div>
                 </div>
 
-                {/* QUADRO DE LÍDERES COMPLETO */}
+                {/* HISTÓRICO DE MESES / LIDERANÇA DETALHADA */}
                 <div className="theme-bg-card border theme-border rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                       <Icon name="Trophy" className="w-5 h-5 text-yellow-500" />
-                      <span className="font-bold text-lg theme-text-main">Líderes do Período Selecionado</span>
+                      <span className="font-bold text-base theme-text-main">Líderes do Período Selecionado</span>
                     </div>
-                    <span className="text-xs bg-emerald-955 text-emerald-400 px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
+                    <span className="text-xs bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
                       {rankingFilter === 'semanal' ? 'Foco da Semana' : (rankingFilter === 'mensal' ? 'Foco do Mês' : 'Geral')}
                     </span>
                   </div>
@@ -2729,15 +2900,13 @@
                       return (
                         <div key={p.id} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0 text-left">
                           <div className="flex items-center gap-4">
-                            <span className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-sm ${isTop ? badgeColors[index] : 'border-slate-800 theme-text-muted theme-bg-input'}`}>
+                            <span className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs ${isTop ? badgeColors[index] : 'border-slate-800 theme-text-muted theme-bg-input'}`}>
                               {index + 1}
                             </span>
                             <div className="flex items-center gap-2.5">
-                              <span className="text-2xl select-none">{renderAvatar(p.avatar, "text-xl")}</span>
+                              <span className="text-xl select-none">{renderAvatar(p.avatar, "text-xl")}</span>
                               <div>
-                                <h4 className="font-semibold text-sm theme-text-main">
-                                  {p.name}
-                                </h4>
+                                <h4 className="font-semibold text-sm theme-text-main">{p.name}</h4>
                                 <p className="text-xs theme-text-muted mt-0.5">{p.sessionCount} sessões no período</p>
                               </div>
                             </div>
@@ -2757,109 +2926,78 @@
             {/* ABA: CRONÔMETRO (FOCO) */}
             {activeTab === 'cronometro' && (
               <div className="max-w-2xl mx-auto space-y-8 animate-fade-in">
-                <div className="theme-bg-card border theme-border rounded-3xl p-8 text-center space-y-6 shadow-xl">
+                <div className="theme-bg-card border theme-border rounded-3xl p-6 md:p-8 text-center space-y-6 shadow-xl">
+                  {/* AJUSTES DE INTERVALOS */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left theme-bg-input p-4 border theme-border rounded-2xl">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] md:text-xs font-bold theme-text-muted uppercase tracking-widest block">Foco (1-180 min)</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="range"
+                          min="1"
+                          max="180"
+                          disabled={isTimerRunning}
+                          value={customFocusMinutes}
+                          onChange={(e) => handleFocusMinutesChange(e.target.value)}
+                          className="w-full accent-emerald-500 cursor-pointer h-1.5 theme-bg-card rounded-lg"
+                        />
+                        <span className="text-xs font-mono font-bold theme-text-accent theme-bg-accent-muted px-2 py-1 rounded border theme-border-accent min-w-[50px] text-center">
+                          {customFocusMinutes}m
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] md:text-xs font-bold theme-text-muted uppercase tracking-widest block">Pausa (1-60 min)</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="range"
+                          min="1"
+                          max="60"
+                          disabled={isTimerRunning}
+                          value={customBreakMinutes}
+                          onChange={(e) => handleBreakMinutesChange(e.target.value)}
+                          className="w-full accent-emerald-500 cursor-pointer h-1.5 theme-bg-card rounded-lg"
+                        />
+                        <span className="text-xs font-mono font-bold theme-text-accent theme-bg-accent-muted px-2 py-1 rounded border theme-border-accent min-w-[50px] text-center">
+                          {customBreakMinutes}m
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                   
-                  {/* SELETOR DE MÉTODO DE ESTUDO NO TOPO */}
+                  {/* SELETOR DE MODO */}
                   <div className="inline-flex theme-bg-input p-1.5 rounded-2xl border theme-border">
                     <button
                       type="button"
                       onClick={() => handleToggleTimerType('free')}
-                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all border-none cursor-pointer ${timerType === 'free' ? 'theme-bg-accent text-white shadow-sm' : 'theme-text-muted hover:theme-text-main bg-transparent'}`}
+                      className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all border-none bg-transparent cursor-pointer ${timerType === 'free' ? 'theme-bg-accent text-white shadow-sm' : 'theme-text-muted hover:theme-text-main'}`}
                     >
                       Estudo Livre
                     </button>
                     <button
                       type="button"
                       onClick={() => handleToggleTimerType('pomodoro')}
-                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 border-none cursor-pointer ${timerType === 'pomodoro' ? 'theme-bg-accent text-white shadow-sm' : 'theme-text-muted hover:theme-text-main bg-transparent'}`}
+                      className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center gap-1.5 border-none bg-transparent cursor-pointer ${timerType === 'pomodoro' ? 'theme-bg-accent text-white shadow-sm' : 'theme-text-muted hover:theme-text-main'}`}
                     >
                       🚀 Pomodoro
                     </button>
                   </div>
 
-                  {/* PAINEL DE CONFIGURAÇÃO MANUAL (SÓ APARECE EM MODO POMODORO) */}
-                  {timerType === 'pomodoro' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left theme-bg-input p-5 border theme-border rounded-2xl animate-fade-in">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold theme-text-muted uppercase tracking-widest block">Minutos de Foco (1-180)</label>
-                        <div className="relative flex items-center">
-                          <input
-                            type="number"
-                            min="1"
-                            max="180"
-                            disabled={isTimerRunning}
-                            value={customFocusMinutes}
-                            onChange={(e) => {
-                              const raw = e.target.value;
-                              if (raw === '') {
-                                setCustomFocusMinutes('');
-                                return;
-                              }
-                              const parsed = parseInt(raw, 10);
-                              if (!isNaN(parsed)) {
-                                const clamped = Math.max(1, Math.min(180, parsed));
-                                handleFocusMinutesChange(clamped);
-                              }
-                            }}
-                            onBlur={() => {
-                              if (customFocusMinutes === '' || isNaN(customFocusMinutes)) {
-                                handleFocusMinutesChange(25);
-                              }
-                            }}
-                            className="w-full bg-slate-950/40 border theme-border rounded-xl px-4 py-3 text-sm theme-text-main font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
-                          />
-                          <span className="absolute right-4 text-xs font-bold theme-text-muted">min</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold theme-text-muted uppercase tracking-widest block">Minutos de Descanso (1-60)</label>
-                        <div className="relative flex items-center">
-                          <input
-                            type="number"
-                            min="1"
-                            max="60"
-                            disabled={isTimerRunning}
-                            value={customBreakMinutes}
-                            onChange={(e) => {
-                              const raw = e.target.value;
-                              if (raw === '') {
-                                setCustomBreakMinutes('');
-                                return;
-                              }
-                              const parsed = parseInt(raw, 10);
-                              if (!isNaN(parsed)) {
-                                const clamped = Math.max(1, Math.min(60, parsed));
-                                handleBreakMinutesChange(clamped);
-                              }
-                            }}
-                            onBlur={() => {
-                              if (customBreakMinutes === '' || isNaN(customBreakMinutes)) {
-                                handleBreakMinutesChange(5);
-                              }
-                            }}
-                            className="w-full bg-slate-950/40 border theme-border rounded-xl px-4 py-3 text-sm theme-text-main font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
-                          />
-                          <span className="absolute right-4 text-xs font-bold theme-text-muted">min</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
                   {timerType === 'pomodoro' && (
                     <div className="text-center">
-                      <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${pomodoroStage === 'work' ? 'bg-rose-955 text-rose-400 border border-rose-500/20' : 'theme-bg-accent-muted theme-text-accent border theme-border-accent'}`}>
-                        {pomodoroStage === 'work' ? `🔥 Período de Foco (${customFocusMinutes} min)` : `☕ Descanso Rápido (${customBreakMinutes} min)`}
+                      <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${pomodoroStage === 'work' ? 'bg-rose-955 text-rose-400 border border-rose-500/20' : 'theme-bg-accent-muted theme-text-accent border theme-border-accent'}`}>
+                        {pomodoroStage === 'work' ? `🔥 Foco (${customFocusMinutes}m)` : `☕ Descanso (${customBreakMinutes}m)`}
                       </span>
                     </div>
                   )}
                   
-                  <div className="max-w-xs mx-auto space-y-2 font-semibold">
-                    <label className="text-xs theme-text-muted uppercase tracking-widest block">Selecione a Matéria</label>
+                  <div className="max-w-xs mx-auto space-y-1.5 font-semibold">
+                    <label className="text-[10px] theme-text-muted uppercase tracking-widest block">Matéria Ativa</label>
                     <select
                       disabled={isTimerRunning}
                       value={selectedSubjectId}
                       onChange={(e) => setSelectedSubjectId(e.target.value)}
-                      className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-sm theme-text-main focus:outline-none"
+                      className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-xs theme-text-main focus:outline-none min-h-[44px]"
                     >
                       {subjects.map((sub) => (
                         <option key={sub.id} value={sub.id}>
@@ -2869,44 +3007,43 @@
                     </select>
                   </div>
                   
-                  {/* RELÓGIO MONUMENTAL PARA TELA CHEIA */}
-                  <div className="py-8">
-                    <div className="text-8xl md:text-9xl lg:text-[10rem] font-black tracking-tight theme-text-main font-mono flex items-center justify-center select-none leading-none">
+                  {/* RELÓGIO MONUMENTAL */}
+                  <div className="py-4 md:py-8">
+                    <div className="text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black tracking-tight theme-text-main font-mono flex items-center justify-center select-none leading-none">
                       {formatTime(timerSeconds)}
                     </div>
-                    <p className="text-xs theme-text-muted mt-5 font-medium uppercase tracking-widest">
+                    <p className="text-[10px] md:text-xs theme-text-muted mt-4 font-medium uppercase tracking-widest">
                       {isTimerRunning ? 'Sessão em andamento' : 'Cronômetro pausado'}
                     </p>
                   </div>
                   
-                  {/* SUPER BOTÕES DE CONTROLE */}
+                  {/* BOTÕES DE CONTROLE */}
                   <div className="flex flex-col items-center gap-4">
-                    <div className="flex items-center justify-center gap-5">
+                    <div className="flex items-center justify-center gap-4">
                       {isTimerRunning ? (
                         <button
                           type="button"
                           onClick={handlePauseTimer}
-                          className="p-7 md:p-9 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-955 transition-all transform hover:scale-105 shadow-lg shadow-amber-500/10 focus:outline-none border-none cursor-pointer"
+                          className="p-6 md:p-9 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-955 transition-all transform hover:scale-105 shadow-lg shadow-amber-500/10 focus:outline-none border-none cursor-pointer min-w-[56px] min-h-[56px] flex items-center justify-center"
                         >
-                          <Icon name="Pause" className="w-10 h-10 md:w-12 md:h-12 text-slate-955" />
+                          <Icon name="Pause" className="w-8 h-8 text-slate-955" />
                         </button>
                       ) : (
                         <button
                           type="button"
-                          id="cronometro-trigger-btn"
                           onClick={handleStartTimer}
-                          className="p-8 md:p-10 rounded-full theme-bg-accent theme-bg-accent-hover text-white transition-all transform hover:scale-105 theme-shadow-accent border-none cursor-pointer focus:outline-none"
+                          className="p-7 md:p-10 rounded-full theme-bg-accent theme-bg-accent-hover text-white transition-all transform hover:scale-105 theme-shadow-accent border-none cursor-pointer focus:outline-none min-w-[64px] min-h-[64px] flex items-center justify-center"
                         >
-                          <Icon name="Play" className="w-12 h-12 md:w-14 md:h-14 text-white fill-current" />
+                          <Icon name="Play" className="w-10 h-10 text-white fill-current" />
                         </button>
                       )}
                       {(isTimerRunning || timerSeconds > 0) && (
                         <button
                           type="button"
                           onClick={handleStopTimer}
-                          className="p-7 md:p-9 rounded-full bg-rose-600 hover:bg-rose-500 text-white transition-all transform hover:scale-105 border-none cursor-pointer shadow-lg shadow-rose-600/10 focus:outline-none"
+                          className="p-6 md:p-9 rounded-full bg-rose-600 hover:bg-rose-500 text-white transition-all transform hover:scale-105 border-none cursor-pointer shadow-lg shadow-rose-600/10 focus:outline-none min-w-[56px] min-h-[56px] flex items-center justify-center"
                         >
-                          <Icon name="Square" className="w-10 h-10 md:w-12 md:h-12 text-white fill-current" />
+                          <Icon name="Square" className="w-8 h-8 text-white fill-current" />
                         </button>
                       )}
                     </div>
@@ -2914,7 +3051,7 @@
                     <button
                       type="button"
                       onClick={triggerPopoutTimer}
-                      className="mt-2 flex items-center justify-center gap-2 px-6 py-3 border border-emerald-500/20 text-xs font-black uppercase tracking-wider theme-text-accent rounded-2xl transition-all shadow-md bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer text-center"
+                      className="mt-2 flex items-center justify-center gap-2 px-5 py-3 border border-emerald-500/20 text-[10px] font-black uppercase tracking-wider theme-text-accent rounded-xl transition-all shadow-md bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer text-center min-h-[44px]"
                       title="Abrir o relógio flutuante sobre os apps"
                     >
                       <Icon name="ExternalLink" className="w-4 h-4 text-emerald-400" />
@@ -2929,10 +3066,10 @@
             {activeTab === 'materias' && (
               <div className="space-y-6 animate-fade-in text-left">
                 <div>
-                  <h3 className="font-bold text-lg theme-text-main">Gerenciamento de Matérias</h3>
-                  <p className="theme-text-muted text-sm font-semibold">Adicione e remova matérias estudadas pelo grupo.</p>
+                  <h3 className="font-bold text-base md:text-lg theme-text-main">Gerenciamento de Matérias</h3>
+                  <p className="theme-text-muted text-xs md:text-sm font-semibold">Adicione e remova matérias estudadas pelo grupo.</p>
                 </div>
-                <form onSubmit={handleAddSubject} className="theme-bg-card border theme-border rounded-2xl p-6 flex flex-col md:flex-row items-end gap-4 shadow-sm font-semibold">
+                <form onSubmit={handleAddSubject} className="theme-bg-card border theme-border rounded-2xl p-5 flex flex-col sm:flex-row items-end gap-4 shadow-sm font-semibold">
                   <div className="flex-1 w-full space-y-2">
                     <label className="text-xs theme-text-muted uppercase tracking-widest block">Nome da Nova Matéria</label>
                     <input
@@ -2941,12 +3078,12 @@
                       value={newSubjectName}
                       onChange={(e) => setNewSubjectName(e.target.value)}
                       placeholder="Ex: Farmacologia Clínica"
-                      className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-sm theme-text-main focus:outline-none focus:ring-1 focus:ring-emerald-500 font-semibold"
+                      className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-xs md:text-sm theme-text-main focus:outline-none min-h-[44px]"
                     />
                   </div>
-                  <div className="w-full md:w-36 space-y-2">
+                  <div className="w-full sm:w-36 space-y-2">
                     <label className="text-xs theme-text-muted uppercase tracking-widest block">Selecione uma Cor</label>
-                    <div className="flex items-center gap-2 theme-bg-input border theme-border rounded-xl px-3 py-2.5">
+                    <div className="flex items-center gap-2 theme-bg-input border theme-border rounded-xl px-3 py-2.5 min-h-[44px]">
                       <input
                         type="color"
                         value={newSubjectColor}
@@ -2958,7 +3095,7 @@
                   </div>
                   <button
                     type="submit"
-                    className="w-full md:w-auto theme-bg-accent theme-bg-accent-hover text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap border-none cursor-pointer transition-all"
+                    className="w-full sm:w-auto theme-bg-accent theme-bg-accent-hover text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap border-none cursor-pointer transition-all min-h-[44px]"
                   >
                     <Icon name="Plus" className="w-5 h-5" /> Adicionar Matéria
                   </button>
@@ -2968,18 +3105,18 @@
                     const subSecs = sessions.filter(s => s.subjectId === sub.id).reduce((a, b) => a + b.durationSeconds, 0);
                     const subHours = (subSecs / 3600).toFixed(1);
                     return (
-                      <div key={sub.id} className="theme-bg-card border theme-border rounded-2xl p-5 flex items-center justify-between shadow-sm">
+                      <div key={sub.id} className="theme-bg-card border theme-border rounded-2xl p-4 md:p-5 flex items-center justify-between shadow-sm">
                         <div className="flex items-center gap-3">
-                          <span className="w-4 h-4 rounded-full" style={{ backgroundColor: sub.color }}></span>
+                          <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: sub.color }}></span>
                           <div>
-                            <h4 className="font-bold text-sm theme-text-main">{sub.name}</h4>
-                            <p className="text-xs theme-text-muted mt-0.5">{subHours}h estudadas pelo grupo</p>
+                            <h4 className="font-bold text-xs md:text-sm theme-text-main">{sub.name}</h4>
+                            <p className="text-[10px] md:text-xs theme-text-muted mt-0.5">{subHours}h acumuladas</p>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleRemoveSubject(sub.id, sub.name)}
-                          className="p-2 hover:bg-rose-955/30 text-slate-500 hover:text-rose-400 rounded-xl transition-all focus:outline-none bg-transparent border-none cursor-pointer"
+                          className="p-2 hover:bg-rose-955/30 text-slate-500 hover:text-rose-400 rounded-xl transition-all focus:outline-none bg-transparent border-none cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
                           title="Excluir Matéria"
                         >
                           <Trash2 className="w-4 h-4 text-rose-500" />
@@ -2996,78 +3133,75 @@
               <div className="space-y-6 animate-fade-in text-left">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="font-bold text-lg theme-text-main">Histórico de Sessões</h3>
-                    <p className="theme-text-muted text-sm font-semibold">Registro de estudos detalhados do grupo.</p>
+                    <h3 className="font-bold text-base md:text-lg theme-text-main">Histórico de Sessões</h3>
+                    <p className="theme-text-muted text-xs md:text-sm font-semibold">Registro de estudos detalhados do grupo.</p>
                   </div>
                   <button
                     type="button"
                     onClick={printReport}
-                    className="flex items-center justify-center gap-2 theme-bg-card border theme-border text-xs font-semibold px-4 py-2.5 rounded-xl theme-text-main transition-colors focus:outline-none hover:bg-black/10 bg-transparent cursor-pointer"
+                    className="flex items-center justify-center gap-2 theme-bg-card border theme-border text-xs font-semibold px-4 py-3 rounded-xl theme-text-main transition-colors focus:outline-none hover:bg-black/10 bg-transparent cursor-pointer min-h-[44px]"
                   >
-                    <Icon name="Download" className="w-4 h-4" /> Exportar / Imprimir Relatório
+                    <Icon name="Download" className="w-4 h-4" /> Exportar Relatório
                   </button>
                 </div>
                 <div className="theme-bg-card border theme-border rounded-2xl overflow-hidden shadow-sm">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="theme-bg-input border-b theme-border text-xs theme-text-muted uppercase tracking-wider font-bold">
-                          <th className="p-4">Estudante</th>
-                          <th className="p-4">Matéria</th>
-                          <th className="p-4">Tempo de Foco</th>
-                          <th className="p-4">Método</th>
-                          <th className="p-4">Data</th>
-                          <th className="p-4 text-right">Ações</th>
+                        <tr className="theme-bg-input border-b theme-border text-[10px] md:text-xs theme-text-muted uppercase tracking-wider font-bold">
+                          <th className="p-3 md:p-4">Estudante</th>
+                          <th className="p-3 md:p-4">Matéria</th>
+                          <th className="p-3 md:p-4">Tempo</th>
+                          <th className="p-3 md:p-4 hidden sm:table-cell">Método</th>
+                          <th className="p-3 md:p-4 text-right">Data/Ações</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y theme-border text-sm theme-text-main">
+                      <tbody className="divide-y theme-border text-xs md:text-sm theme-text-main">
                         {sessions.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="p-8 text-center theme-text-muted font-semibold">
+                            <td colSpan={5} className="p-8 text-center theme-text-muted font-semibold">
                               Nenhuma sessão registrada. Comece a focar agora!
                             </td>
                           </tr>
                         ) : (
                           sessions.map((sess) => {
-                            const formattedDate = sess.startTime 
-                              ? (sess.startTime.toDate ? sess.startTime.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : new Date(sess.startTime).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })) 
-                              : 'Salvando...';
+                            const formattedDate = safeParseDate(sess.startTime).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
                             return (
                               <tr key={sess.id} className="hover:bg-black/5 transition-colors">
-                                <td className="p-4">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xl select-none">{renderAvatar(sess.userAvatar, "text-xl")}</span>
-                                    <span className="font-semibold theme-text-main">{sess.userName}</span>
+                                <td className="p-3 md:p-4">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-lg select-none">{sess.userAvatar}</span>
+                                    <span className="font-semibold theme-text-main truncate max-w-[60px] sm:max-w-none">{sess.userName}</span>
                                   </div>
                                 </td>
-                                <td className="p-4">
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold theme-bg-input border theme-border" style={{ color: sess.subjectColor, backgroundColor: 'rgba(0,0,0,0.05)', borderColor: sess.subjectColor + '30' }}>
-                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sess.subjectColor }}></span>
-                                    {sess.subjectName}
+                                <td className="p-3 md:p-4">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold theme-bg-input border theme-border" style={{ color: sess.subjectColor, borderColor: sess.subjectColor + '30' }}>
+                                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: sess.subjectColor }}></span>
+                                    <span className="truncate max-w-[80px] sm:max-w-none">{sess.subjectName}</span>
                                   </span>
                                 </td>
-                                <td className="p-4 font-mono font-bold theme-text-main">
-                                  {Math.round((sess.durationSeconds || 0) / 60)} min
+                                <td className="p-3 md:p-4 font-mono font-bold theme-text-main">
+                                  {Math.round((sess.durationSeconds || 0) / 60)}m
                                 </td>
-                                <td className="p-4">
-                                  <span className={`text-xs uppercase tracking-wider font-bold ${sess.type === 'pomodoro' ? 'text-rose-400' : 'theme-text-accent'}`}>
-                                    {sess.type === 'pomodoro' ? '🍅 Pomodoro' : '🌱 Estudo Livre'}
+                                <td className="p-3 md:p-4 hidden sm:table-cell">
+                                  <span className={`text-[10px] uppercase tracking-wider font-bold ${sess.type === 'pomodoro' ? 'text-rose-400' : 'theme-text-accent'}`}>
+                                    {sess.type === 'pomodoro' ? '🍅 Pomodoro' : '🌱 Livre'}
                                   </span>
                                 </td>
-                                <td className="p-4 text-xs theme-text-muted font-semibold">
-                                  {formattedDate}
-                                </td>
-                                <td className="p-4 text-right">
-                                  {sess.userId === activeProfile?.id && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteSession(sess.id)}
-                                      className="p-1 hover:bg-[#ff0000]/10 text-rose-500 rounded-lg transition-colors border-none bg-transparent cursor-pointer focus:outline-none"
-                                      title="Excluir do Histórico"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
-                                  )}
+                                <td className="p-3 md:p-4 text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <span className="text-[10px] theme-text-muted hidden md:inline font-semibold">{formattedDate}</span>
+                                    {sess.userId === activeProfile?.id && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteSession(sess.id)}
+                                        className="p-2 hover:bg-[#ff0000]/10 text-rose-500 rounded-lg transition-colors border-none bg-transparent cursor-pointer focus:outline-none min-w-[36px] min-h-[36px] flex items-center justify-center"
+                                        title="Excluir"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -3087,47 +3221,48 @@
             {activeTab === 'playlists' && (
               <div className="space-y-6 animate-fade-in text-left">
                 <div>
-                  <h3 className="font-bold text-lg theme-text-main">Playlists do Grupo</h3>
-                  <p className="theme-text-muted text-sm font-semibold">Compartilhe e ouça trilhas sonoras focadas do Spotify e YouTube com o grupo.</p>
+                  <h3 className="font-bold text-base md:text-lg theme-text-main">Playlists do Grupo</h3>
+                  <p className="theme-text-muted text-xs md:text-sm font-semibold">Compartilhe e ouça trilhas sonoras focadas do Spotify e YouTube com o grupo.</p>
                 </div>
 
-                <form onSubmit={handleAddPlaylist} className="theme-bg-card border theme-border rounded-2xl p-6 flex flex-col md:flex-row items-end gap-4 shadow-sm font-semibold">
-                  <div className="flex-1 w-full space-y-2">
-                    <label className="text-xs theme-text-muted uppercase tracking-widest block">Título ou Descrição</label>
-                    <input
-                      type="text"
-                      required
-                      value={newPlaylistTitle}
-                      onChange={(e) => setNewPlaylistTitle(e.target.value)}
-                      placeholder="Ex: Lofi Hip Hop para Concentração Máxima"
-                      className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-sm theme-text-main focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex-[1.5] w-full space-y-2">
-                    <label className="text-xs theme-text-muted uppercase tracking-widest block">Link do Spotify ou YouTube</label>
-                    <input
-                      type="url"
-                      required
-                      value={newPlaylistLink}
-                      onChange={(e) => setNewPlaylistLink(e.target.value)}
-                      placeholder="https://open.spotify.com/... ou https://www.youtube.com/..."
-                      className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-sm theme-text-main focus:outline-none"
-                    />
+                <form onSubmit={handleAddPlaylist} className="theme-bg-card border theme-border rounded-2xl p-5 flex flex-col gap-4 shadow-sm font-semibold">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    <div className="space-y-1.5">
+                      <label className="text-xs theme-text-muted uppercase tracking-widest block">Título</label>
+                      <input
+                        type="text"
+                        required
+                        value={newPlaylistTitle}
+                        onChange={(e) => setNewPlaylistTitle(e.target.value)}
+                        placeholder="Ex: Lofi Hip Hop para Concentração"
+                        className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-xs md:text-sm theme-text-main focus:outline-none min-h-[44px]"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs theme-text-muted uppercase tracking-widest block">Link Spotify ou YouTube</label>
+                      <input
+                        type="url"
+                        required
+                        value={newPlaylistLink}
+                        onChange={(e) => setNewPlaylistLink(e.target.value)}
+                        placeholder="https://open.spotify.com/... ou https://www.youtube.com/..."
+                        className="w-full theme-bg-input border theme-border rounded-xl px-4 py-3 text-xs md:text-sm theme-text-main focus:outline-none min-h-[44px]"
+                      />
+                    </div>
                   </div>
                   <button
                     type="submit"
-                    className="w-full md:w-auto theme-bg-accent theme-bg-accent-hover text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap border-none cursor-pointer transition-all"
+                    className="sm:self-end theme-bg-accent theme-bg-accent-hover text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap border-none cursor-pointer transition-all min-h-[44px]"
                   >
-                    <Icon name="Plus" className="w-5 h-5" /> Compartilhar
+                    <Icon name="Plus" className="w-5 h-5" /> Compartilhar Playlist
                   </button>
                 </form>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {playlists.length === 0 ? (
                     <div className="col-span-2 text-center py-16 theme-bg-card border theme-border rounded-2xl theme-text-muted">
-                      <Music className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                      <p className="text-sm font-semibold">Nenhuma playlist cadastrada pelo grupo.</p>
-                      <p className="text-xs mt-1">Insira um link do Spotify ou YouTube acima para começar!</p>
+                      <Music className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                      <p className="text-xs md:text-sm font-semibold">Nenhuma playlist compartilhada.</p>
                     </div>
                   ) : (
                     playlists.map((pl) => {
@@ -3137,24 +3272,24 @@
                       const embedUrl = spotifyEmbed || youtubeEmbed;
 
                       return (
-                        <div key={pl.id} className="theme-bg-card border theme-border rounded-2xl p-5 shadow-sm flex flex-col space-y-4 justify-between h-[450px]">
+                        <div key={pl.id} className="theme-bg-card border theme-border rounded-2xl p-4 md:p-5 shadow-sm flex flex-col space-y-4 justify-between h-[380px] md:h-[420px]">
                           <div className="flex items-center justify-between border-b theme-border pb-3">
                             <div className="flex items-center gap-2">
-                              <span className="text-2xl select-none">{renderAvatar(pl.userAvatar, "text-2xl")}</span>
+                              <span className="text-xl select-none">{pl.userAvatar}</span>
                               <div>
-                                <h4 className="font-bold text-sm theme-text-main line-clamp-1">{pl.title}</h4>
-                                <p className="text-[10px] theme-text-muted">Indicado por {pl.userName}</p>
+                                <h4 className="font-bold text-xs md:text-sm theme-text-main line-clamp-1">{pl.title}</h4>
+                                <p className="text-[9px] md:text-[10px] theme-text-muted">Indicado por {pl.userName}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${isSpotify ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                              <span className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${isSpotify ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
                                 {isSpotify ? 'Spotify' : 'YouTube'}
                               </span>
                               {(pl.userId === activeProfile?.id || activeProfile?.id === 'key') && (
                                 <button
                                   type="button"
                                   onClick={() => handleDeletePlaylist(pl.id)}
-                                  className="text-slate-500 hover:text-rose-500 transition-colors border-none bg-transparent cursor-pointer p-1"
+                                  className="text-slate-500 hover:text-rose-500 transition-colors border-none bg-transparent cursor-pointer p-2 min-w-[36px] min-h-[36px] flex items-center justify-center"
                                   title="Remover Playlist"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -3163,7 +3298,6 @@
                             </div>
                           </div>
 
-                          {/* IFRAME EMBED RESPONSIVO */}
                           <div className="flex-1 w-full bg-slate-950 rounded-xl overflow-hidden relative border theme-border">
                             {embedUrl ? (
                               <iframe
@@ -3178,7 +3312,7 @@
                               ></iframe>
                             ) : (
                               <div className="flex items-center justify-center h-full text-xs theme-text-muted">
-                                Link corrompido ou indisponível.
+                                Link de áudio indisponível.
                               </div>
                             )}
                           </div>
@@ -3194,8 +3328,8 @@
             {activeTab === 'grupo' && (
               <div className="space-y-6 animate-fade-in text-left">
                 <div>
-                  <h3 className="font-bold text-lg theme-text-main">Sala Virtual de Estudos</h3>
-                  <p className="theme-text-muted text-sm font-semibold">Status e cronômetro em tempo real do grupo.</p>
+                  <h3 className="font-bold text-base md:text-lg theme-text-main">Sala Virtual de Estudos</h3>
+                  <p className="theme-text-muted text-xs md:text-sm font-semibold">Status e cronômetro em tempo real do grupo.</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -3209,16 +3343,16 @@
                       percentTimer = Math.min(Math.round(((p.timerTargetSeconds - p.timerSeconds) / p.timerTargetSeconds) * 100), 100);
                     }
                     return (
-                      <div key={p.id} className="theme-bg-card border theme-border rounded-2xl p-6 flex flex-col justify-between space-y-4 shadow-sm min-h-[220px] transition-all duration-300">
+                      <div key={p.id} className="theme-bg-card border theme-border rounded-2xl p-5 md:p-6 flex flex-col justify-between space-y-4 shadow-sm min-h-[200px] transition-all duration-300">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
-                            <span className="select-none">{renderAvatar(p.avatar, "text-4xl")}</span>
+                            <span className="select-none text-4xl">{p.avatar}</span>
                             <div>
-                              <h4 className="font-bold text-base theme-text-main">{p.name}</h4>
-                              <span className="text-xs theme-text-muted flex items-center gap-1.5 mt-0.5 font-semibold">
-                                <span className={`w-2.5 h-2.5 rounded-full ${p.isStudying ? 'bg-rose-500 animate-ping' : (isOnline ? 'bg-emerald-400' : 'bg-slate-600')}`}></span>
+                              <h4 className="font-bold text-sm md:text-base theme-text-main">{p.name}</h4>
+                              <span className="text-[10px] md:text-xs theme-text-muted flex items-center gap-1.5 mt-0.5 font-semibold">
+                                <span className={`w-2 h-2 rounded-full ${p.isStudying ? 'bg-rose-500 animate-ping' : (isOnline ? 'bg-emerald-400' : 'bg-slate-600')}`}></span>
                                 {p.isStudying 
-                                  ? (p.isTimerRunning ? `Estudando: ${p.currentSubject || 'Estudos'}` : `Pausado: ${p.currentSubject || 'Estudos'}`) 
+                                  ? (p.isTimerRunning ? `Estudando: ${p.currentSubject || 'Foco'}` : `Pausado: ${p.currentSubject || 'Foco'}`) 
                                   : (isOnline ? 'Disponível' : 'Offline')}
                               </span>
                             </div>
@@ -3228,24 +3362,24 @@
                         {/* --- EXIBIÇÃO CONDICIONAL DO TEMPORIZADOR --- */}
                         {p.isStudying ? (
                           <div className="theme-bg-input p-3 rounded-xl border theme-border space-y-2 animate-fade-in">
-                            <div className="flex items-center justify-between text-[10px]">
+                            <div className="flex items-center justify-between text-[9px] md:text-[10px]">
                               <span className="theme-text-muted font-bold uppercase tracking-wider">Temporizador</span>
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${p.timerType === 'free' ? 'theme-bg-accent-muted theme-text-accent' : 'bg-rose-955 text-rose-400'}`}>
+                              <span className={`px-2 py-0.5 rounded text-[8px] md:text-[9px] font-bold uppercase tracking-wider ${p.timerType === 'free' ? 'theme-bg-accent-muted theme-text-accent' : 'bg-rose-955 text-rose-400'}`}>
                                 {p.timerType === 'free' ? 'Estudo Livre' : `Pomodoro: ${p.pomodoroStage === 'work' ? 'Foco' : 'Descanso'}`}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-xl font-mono font-bold theme-text-main tracking-tight">
+                              <span className="text-lg md:text-xl font-mono font-bold theme-text-main tracking-tight">
                                 {formatTime(p.timerSeconds)}
                               </span>
-                              <span className="text-[11px] theme-text-muted flex items-center gap-1.5 font-bold">
-                                <span className={`w-2.5 h-2.5 rounded-full ${p.isTimerRunning ? 'theme-bg-accent animate-pulse' : 'bg-amber-400'}`}></span>
+                              <span className="text-[10px] md:text-[11px] theme-text-muted flex items-center gap-1.5 font-bold">
+                                <span className={`w-2 h-2 rounded-full ${p.isTimerRunning ? 'theme-bg-accent animate-pulse' : 'bg-amber-400'}`}></span>
                                 {p.isTimerRunning ? 'Rodando' : 'Pausado'}
                               </span>
                             </div>
                             {p.timerType === 'pomodoro' && p.timerTargetSeconds > 0 && (
                               <div className="space-y-1">
-                                <div className="w-full theme-bg-main h-1.5 rounded-full overflow-hidden">
+                                <div className="w-full theme-bg-main h-1 rounded-full overflow-hidden">
                                   <div 
                                     className="theme-bg-accent h-full transition-all duration-500" 
                                     style={{ width: `${percentTimer}%` }}
@@ -3255,33 +3389,33 @@
                             )}
                           </div>
                         ) : (
-                          <div className="py-2 flex items-center justify-center text-xs theme-text-muted border border-dashed theme-border rounded-xl">
+                          <div className="py-2 flex items-center justify-center text-[10px] md:text-xs theme-text-muted border border-dashed theme-border rounded-xl">
                             😴 Sem sessões de foco ativas
                           </div>
                         )}
                         
                         <div className="grid grid-cols-2 gap-2 theme-bg-input p-3 rounded-xl text-center">
                           <div>
-                            <span className="text-xs theme-text-muted block font-semibold">Tempo Total</span>
-                            <strong className="theme-text-accent text-sm">{uStats.totalHours} horas</strong>
+                            <span className="text-[10px] md:text-xs theme-text-muted block font-semibold">Tempo Total</span>
+                            <strong className="theme-text-accent text-xs md:text-sm">{uStats.totalHours}h</strong>
                           </div>
                           <div>
-                            <span className="text-xs theme-text-muted block font-semibold">Sessões</span>
-                            <strong className="theme-text-accent text-sm">{uStats.sessionCount} focos</strong>
+                            <span className="text-[10px] md:text-xs theme-text-muted block font-semibold">Sessões</span>
+                            <strong className="theme-text-accent text-xs md:text-sm">{uStats.sessionCount} f</strong>
                           </div>
                         </div>
                         
                         <div>
-                          <span className="text-[10px] uppercase tracking-wider font-semibold theme-text-muted block mb-2">Conquistas</span>
+                          <span className="text-[9px] md:text-[10px] uppercase tracking-wider font-semibold theme-text-muted block mb-2">Conquistas</span>
                           {badges.length === 0 ? (
-                            <span className="text-xs theme-text-muted">Ainda sem conquistas liberadas</span>
+                            <span className="text-xs theme-text-muted">Ainda sem conquistas</span>
                           ) : (
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex flex-wrap gap-1">
                               {badges.map((badge, i) => (
                                 <span 
                                   key={i} 
                                   title={badge.desc}
-                                  className={`text-xs px-2 py-0.5 rounded-md border flex items-center gap-1 ${badge.color}`}
+                                  className={`text-[10px] px-2 py-0.5 rounded border flex items-center gap-1 ${badge.color}`}
                                 >
                                   <span>{badge.icon}</span>
                                   {badge.name}
@@ -3298,99 +3432,267 @@
             )}
           </main>
 
-          {/* PAINEL LATERAL DIREITO (BATE-PAPO ROLÁVEL) */}
-          {isChatOpen && activeProfile && (
-            <aside className="w-full lg:w-80 theme-bg-sidebar border-t lg:border-t-0 lg:border-l theme-border flex flex-col justify-between shrink-0 h-96 lg:h-full right-0 z-40 animate-fade-in shadow-2xl overflow-hidden">
-              <div className="p-4 border-b theme-border flex items-center justify-between bg-black/10 shrink-0">
-                <div className="flex items-center gap-2">
-                  <Icon name="MessageCircle" className="theme-text-accent w-5 h-5 animate-pulse" />
-                  <span className="font-bold text-sm tracking-wide theme-text-main">Bate-papo do Grupo</span>
+          {/* PAINEL LATERAL DIREITO - CHAT */}
+          <aside className={`fixed lg:static inset-y-0 right-0 z-40 w-full sm:w-80 lg:w-80 theme-bg-sidebar border-t lg:border-t-0 lg:border-l theme-border flex flex-col justify-between shrink-0 h-full transform transition-transform duration-300 ease-in-out shadow-2xl overflow-hidden ${isChatOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
+            <div className="p-4 border-b theme-border flex items-center justify-between bg-black/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <Icon name="MessageCircle" className="theme-text-accent w-5 h-5 animate-pulse" />
+                <span className="font-bold text-sm tracking-wide theme-text-main">Bate-papo do Grupo</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsChatOpen(false)}
+                className="p-2 hover:bg-black/10 theme-text-muted hover:theme-text-main rounded-lg transition-colors focus:outline-none bg-transparent border-none cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                title="Ocultar Chat"
+              >
+                <Icon name="ChevronRight" className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="flex-grow p-4 overflow-y-auto space-y-3 scrollbar-thin flex flex-col bg-slate-950/20">
+              {chatMessages.length === 0 ? (
+                <div className="text-center py-12 theme-text-muted my-auto">
+                  <p className="text-xs">Nenhuma mensagem.</p>
+                  <p className="text-[10px] mt-1 font-sans">Diga olá para o seu grupo de estudos! 👋</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsChatOpen(false)}
-                  className="p-1 hover:bg-black/10 theme-text-muted hover:theme-text-main rounded-lg transition-colors focus:outline-none bg-transparent border-none cursor-pointer"
-                  title="Ocultar Chat"
-                >
-                  <Icon name="ChevronRight" className="w-4 h-4" />
-                </button>
-              </div>
-              
-              <div className="flex-grow p-4 overflow-y-auto space-y-3 scrollbar-thin flex flex-col">
-                {chatMessages.length === 0 ? (
-                  <div className="text-center py-12 theme-text-muted my-auto">
-                    <p className="text-xs">Nenhuma mensagem.</p>
-                    <p className="text-[10px] mt-1 font-sans">Diga olá para o seu grupo de estudos! 👋</p>
-                  </div>
-                ) : (
-                  (() => {
-                    let hasShownDivider = false;
-                    return chatMessages.map((msg, i) => {
-                      const isMe = msg.userId === activeProfile.id;
-                      const colorObj = MARKER_COLORS.find(c => c.id === msg.userColor) || MARKER_COLORS[0];
-                      
-                      let msgTimeMillis = 0;
-                      if (msg.timestamp) {
-                        msgTimeMillis = msg.timestamp.toMillis ? msg.timestamp.toMillis() : new Date(msg.timestamp).getTime();
-                      } else {
-                        msgTimeMillis = Date.now();
-                      }
-                      
-                      const isNewMessage = msgTimeMillis > sessionJoinTime;
-                      const showDivider = isNewMessage && !hasShownDivider && !isMe;
-                      if (showDivider) {
-                        hasShownDivider = true;
-                      }
-                      return (
-                        <React.Fragment key={msg.id || i}>
-                          {showDivider && (
-                            <div className="flex items-center my-4 select-none shrink-0 animate-pulse font-sans flex-row font-semibold">
-                              <div className="flex-grow border-t border-emerald-500/20"></div>
-                              <span className="mx-3 text-[9px] font-bold theme-text-accent uppercase tracking-widest bg-[#0b0b0d] px-2 py-0.5 rounded-md border border-emerald-500/10">Novas Mensagens</span>
-                              <div className="flex-grow border-t border-emerald-500/20"></div>
-                            </div>
-                          )}
-                          <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className="select-none">{renderAvatar(msg.userAvatar, "text-xs")}</span>
-                              <span className={`text-[10px] font-bold ${colorObj.text}`}>{msg.userName}</span>
-                            </div>
-                            <div className={`p-3 rounded-2xl max-w-[85%] text-xs break-words shadow-inner ${isMe ? 'theme-bg-accent text-white rounded-tr-none' : 'theme-bg-input theme-text-main'} border-none`}>
-                              {msg.text}
-                            </div>
+              ) : (
+                (() => {
+                  let hasShownDivider = false;
+                  return chatMessages.map((msg, i) => {
+                    const isMe = msg.userId === activeProfile.id;
+                    const colorObj = MARKER_COLORS.find(c => c.id === msg.userColor) || MARKER_COLORS[0];
+                    
+                    let msgTimeMillis = 0;
+                    if (msg.timestamp) {
+                      msgTimeMillis = msg.timestamp.toMillis ? msg.timestamp.toMillis() : new Date(msg.timestamp).getTime();
+                    } else {
+                      msgTimeMillis = Date.now();
+                    }
+                    
+                    const isNewMessage = msgTimeMillis > sessionJoinTime;
+                    const showDivider = isNewMessage && !hasShownDivider && !isMe;
+                    if (showDivider) {
+                      hasShownDivider = true;
+                    }
+                    return (
+                      <React.Fragment key={msg.id || i}>
+                        {showDivider && (
+                          <div className="flex items-center my-4 select-none shrink-0 animate-pulse font-sans flex-row font-semibold">
+                            <div className="flex-grow border-t border-emerald-500/20"></div>
+                            <span className="mx-2 text-[8px] font-bold theme-text-accent uppercase tracking-widest bg-slate-950 px-2 py-0.5 rounded border border-emerald-500/10">Novas Mensagens</span>
+                            <div className="flex-grow border-t border-emerald-500/20"></div>
                           </div>
-                        </React.Fragment>
-                      );
-                    });
-                  })()
-                )}
-                <div ref={chatEndRef} />
+                        )}
+                        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="select-none text-xs">{msg.userAvatar}</span>
+                            <span className={`text-[9px] md:text-[10px] font-bold ${colorObj.text}`}>{msg.userName}</span>
+                          </div>
+                          <div className={`p-3 rounded-2xl max-w-[85%] text-xs break-words shadow-inner ${isMe ? 'theme-bg-accent text-white rounded-tr-none' : 'theme-bg-input theme-text-main'} border-none`}>
+                            {msg.text}
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    );
+                  });
+                })()
+              )}
+              <div ref={chatEndRef} />
+            </div>
+            
+            <form onSubmit={handleSendChatMessage} className="p-3 border-t border-slate-800 bg-slate-950/20 flex gap-2 shrink-0">
+              <input
+                type="text"
+                required
+                placeholder="Digite uma mensagem..."
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                className="flex-1 border border-slate-800 rounded-xl px-3 py-3 text-xs focus:outline-none theme-bg-input theme-text-main min-h-[44px]"
+              />
+              <button
+                type="submit"
+                className="p-3 rounded-xl transition-all shadow-md theme-bg-accent hover:theme-bg-accent-hover text-white focus:outline-none border-none cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <Icon name="Send" className="w-4 h-4 text-white" />
+              </button>
+            </form>
+          </aside>
+
+          {/* BARRA DE NAVEGAÇÃO INFERIOR (MOBILE BOTTOM NAV - APP STYLE) */}
+          <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 theme-bg-sidebar border-t theme-border flex items-center justify-around z-35 px-1 pb-safe shadow-xl">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center border-none bg-transparent cursor-pointer ${activeTab === 'dashboard' ? 'theme-text-accent' : 'theme-text-muted'}`}
+            >
+              <BarChart3 className="w-5 h-5 mb-0.5" />
+              <span className="text-[9px] font-bold">Painel</span>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('cronometro')}
+              className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center border-none bg-transparent cursor-pointer relative ${activeTab === 'cronometro' ? 'theme-text-accent' : 'theme-text-muted'}`}
+            >
+              <Clock className="w-5 h-5 mb-0.5" />
+              <span className="text-[9px] font-bold">Foco</span>
+              {isTimerRunning && (
+                <span className="absolute top-2.5 right-6 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+              )}
+            </button>
+            
+            <button
+              onClick={() => setIsChatOpen(!isChatOpen)}
+              className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center border-none bg-transparent cursor-pointer relative ${isChatOpen ? 'theme-text-accent' : 'theme-text-muted'}`}
+            >
+              <MessageCircle className="w-5 h-5 mb-0.5" />
+              <span className="text-[9px] font-bold">Chat</span>
+              {unreadChatCount > 0 && (
+                <span className="absolute top-1.5 right-4 bg-rose-600 text-white font-black text-[8px] px-1.5 py-0.5 rounded-full animate-pulse">{unreadChatCount}</span>
+              )}
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('grupo')}
+              className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center border-none bg-transparent cursor-pointer ${activeTab === 'grupo' ? 'theme-text-accent' : 'theme-text-muted'}`}
+            >
+              <Users className="w-5 h-5 mb-0.5" />
+              <span className="text-[9px] font-bold">Grupo</span>
+            </button>
+            
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex flex-col items-center justify-center flex-1 h-full py-1 text-center border-none bg-transparent cursor-pointer theme-text-muted"
+            >
+              <MoreIcon className="w-5 h-5 mb-0.5" />
+              <span className="text-[9px] font-bold">Mais</span>
+            </button>
+          </nav>
+
+          {/* BOTTOM SHEET - MENU EXPANDIDO PARA CELULAR */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden fixed inset-0 z-50 bg-black/75 flex flex-col justify-end animate-fade-in">
+              <div 
+                className="absolute inset-0" 
+                onClick={() => setIsMobileMenuOpen(false)}
+              ></div>
+              <div className="w-full theme-bg-sidebar border-t-2 theme-border-accent rounded-t-[2.5rem] p-6 space-y-6 relative z-10 max-h-[85vh] overflow-y-auto scrollbar-thin">
+                <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-2"></div>
+                
+                <div className="flex items-center justify-between border-b theme-border pb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl select-none">{activeProfile.avatar}</span>
+                    <div className="text-left">
+                      <h4 className="font-extrabold text-sm theme-text-main">{activeProfile.name}</h4>
+                      <p className="text-[10px] theme-text-muted uppercase tracking-wider font-bold">Sessão Ativa</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      openExternalEditProfile(activeProfile);
+                    }}
+                    className="flex items-center gap-1 border theme-border px-3 py-1.5 rounded-xl text-xs theme-text-accent bg-transparent font-semibold cursor-pointer min-h-[38px]"
+                  >
+                    <Icon name="Edit3" className="w-3.5 h-3.5" /> Editar
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-left">
+                  {[
+                    { id: 'materias', label: 'Disciplinas', icon: BookOpen },
+                    { id: 'estatisticas', label: 'Estatísticas & Afazeres', icon: Award },
+                    { id: 'playlists', label: 'Playlists', icon: Music },
+                    { id: 'historico', label: 'Histórico', icon: Calendar },
+                  ].map((subtab) => {
+                    const SubIcon = subtab.icon;
+                    return (
+                      <button
+                        key={subtab.id}
+                        onClick={() => {
+                          setActiveTab(subtab.id);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`flex items-center gap-3 p-3.5 rounded-xl border-none transition-all ${activeTab === subtab.id ? 'theme-bg-accent-muted theme-text-accent font-bold' : 'theme-bg-input theme-text-muted'} cursor-pointer text-xs font-semibold`}
+                      >
+                        <SubIcon className="w-4 h-4" />
+                        <span>{subtab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* MOBILE CONTROLE DE PREFERÊNCIAS */}
+                <div className="p-4 rounded-2xl theme-bg-input border theme-border space-y-4 text-left text-xs">
+                  <div className="space-y-2">
+                    <span className="font-bold theme-text-main text-[10px] uppercase tracking-wider block">Modo de Exibição</span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handlePreferenceChange('claro', null)}
+                        className={`py-2 px-3 rounded-xl border font-bold text-xs transition-all cursor-pointer border-none min-h-[36px] ${selectedMode === 'claro' ? 'theme-bg-accent text-white shadow-sm' : 'theme-text-muted theme-bg-sidebar'}`}
+                      >
+                        ☀️ Claro
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePreferenceChange('escuro', null)}
+                        className={`py-2 px-3 rounded-xl border font-bold text-xs transition-all cursor-pointer border-none min-h-[36px] ${selectedMode === 'escuro' ? 'theme-bg-accent text-white shadow-sm' : 'theme-text-muted theme-bg-sidebar'}`}
+                      >
+                        🌙 Escuro
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="font-bold theme-text-main text-[10px] uppercase tracking-wider block">Cor de Destaque</span>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { id: 'azul', name: 'Azul', hex: '#3b82f6' },
+                        { id: 'lilas', name: 'Lilás', hex: '#a855f7' },
+                        { id: 'cafe', name: 'Bege', hex: '#dfb982' },
+                        { id: 'verde', name: 'Verde', hex: '#10b981' },
+                        { id: 'vermelho', name: 'Vinho', hex: '#f43f5e' },
+                        { id: 'teal', name: 'Teal', hex: '#14b8a6' }
+                      ].map(color => (
+                        <button
+                          key={color.id}
+                          type="button"
+                          onClick={() => handlePreferenceChange(null, color.id)}
+                          className={`py-2 px-1 rounded-xl border text-[10px] font-bold text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 border-none min-h-[36px] ${selectedColor === color.id ? 'theme-bg-accent-muted theme-text-accent' : 'theme-text-muted theme-bg-sidebar hover:theme-text-main'}`}
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color.hex }}></span>
+                          {color.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleSignOut();
+                    }}
+                    className="flex-1 py-3 bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 font-bold text-xs rounded-xl border border-rose-500/20 cursor-pointer min-h-[44px]"
+                  >
+                    Desconectar Perfil
+                  </button>
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex-1 py-3 theme-bg-input text-slate-300 font-bold text-xs rounded-xl border theme-border cursor-pointer min-h-[44px]"
+                  >
+                    Fechar
+                  </button>
+                </div>
               </div>
-              
-              <form onSubmit={handleSendChatMessage} className="p-3 border-t border-slate-800 bg-slate-950/20 flex gap-2 shrink-0">
-                <input
-                  type="text"
-                  required
-                  placeholder="Digite uma mensagem..."
-                  value={chatInput}
-                  onChange={e => setChatInput(e.target.value)}
-                  className="flex-1 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none theme-bg-input theme-text-main"
-                />
-                <button
-                  type="submit"
-                  className="p-2.5 rounded-xl transition-all shadow-md theme-bg-accent hover:theme-bg-accent-hover text-white focus:outline-none border-none cursor-pointer"
-                >
-                  <Icon name="Send" className="w-4 h-4 text-white" />
-                </button>
-              </form>
-            </aside>
+            </div>
           )}
 
           {/* MODAL CRIAR PERFIS */}
           {isCreatingProfile && (
             <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-              <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative text-left">
-                <h3 className="text-2xl font-bold text-white mb-6">Criar Novo Perfil</h3>
+              <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative text-left">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6">Criar Novo Perfil</h3>
                 <form onSubmit={handleCreateProfile} className="space-y-6">
                   <div>
                     <label className="block text-sm font-semibold text-slate-300 mb-2">Nome do Estudante</label>
@@ -3401,7 +3703,7 @@
                       placeholder="Ex: Pedro"
                       value={profileFormName}
                       onChange={e => setProfileFormName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold min-h-[44px]"
                     />
                   </div>
                   <div>
@@ -3412,7 +3714,7 @@
                           key={a}
                           type="button"
                           onClick={() => setProfileFormAvatar(a)}
-                          className={`p-2 rounded-lg transition-all flex items-center justify-center overflow-hidden h-12 ${profileFormAvatar === a ? 'bg-emerald-950 text-emerald-400 border border-emerald-500' : 'bg-slate-950 border border-slate-800/60'} cursor-pointer`}
+                          className={`p-2 rounded-lg transition-all flex items-center justify-center overflow-hidden h-12 ${profileFormAvatar === a ? 'bg-[#223b31]' : 'bg-slate-950 border border-slate-800/60'} cursor-pointer`}
                         >
                           {renderAvatar(a, "text-xl")}
                         </button>
@@ -3439,13 +3741,13 @@
                     <button
                       type="button"
                       onClick={() => setIsCreatingProfile(false)}
-                      className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold transition-all focus:outline-none border-none cursor-pointer"
+                      className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold transition-all focus:outline-none border-none cursor-pointer min-h-[44px]"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10 focus:outline-none border-none cursor-pointer"
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10 focus:outline-none border-none cursor-pointer min-h-[44px]"
                     >
                       Salvar Perfil
                     </button>
@@ -3458,8 +3760,8 @@
           {/* MODAL EDITAR PERFIL */}
           {isEditingProfile && (
             <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-              <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative text-left">
-                <h3 className="text-2xl font-bold text-white mb-6">Editar Perfil</h3>
+              <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative text-left">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6">Editar Perfil</h3>
                 <form onSubmit={handleEditProfile} className="space-y-6">
                   <div>
                     <label className="block text-sm font-semibold text-slate-300 mb-2">Nome do Estudante</label>
@@ -3470,7 +3772,7 @@
                       placeholder="Ex: Pedro"
                       value={profileFormName}
                       onChange={e => setProfileFormName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold min-h-[44px]"
                     />
                   </div>
                   <div>
@@ -3481,7 +3783,7 @@
                           key={a}
                           type="button"
                           onClick={() => setProfileFormAvatar(a)}
-                          className={`p-2 rounded-lg transition-all flex items-center justify-center overflow-hidden h-12 ${profileFormAvatar === a ? 'bg-emerald-950 text-emerald-400 border border-emerald-500' : 'bg-slate-950 border border-slate-800/60'} cursor-pointer`}
+                          className={`p-2 rounded-lg transition-all flex items-center justify-center overflow-hidden h-12 ${profileFormAvatar === a ? 'bg-[#223b31]' : 'bg-slate-950 border border-slate-800/60'} cursor-pointer`}
                         >
                           {renderAvatar(a, "text-xl")}
                         </button>
@@ -3508,13 +3810,13 @@
                     <button
                       type="button"
                       onClick={() => setIsEditingProfile(false)}
-                      className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold transition-all focus:outline-none border-none cursor-pointer"
+                      className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold transition-all focus:outline-none border-none cursor-pointer min-h-[44px]"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10 focus:outline-none border-none cursor-pointer"
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10 focus:outline-none border-none cursor-pointer min-h-[44px]"
                     >
                       Salvar Alterações
                     </button>
@@ -3529,21 +3831,21 @@
             <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
               <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 text-left">
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-2">{confirmModal.title}</h3>
+                  <h3 className="text-base md:text-lg font-bold text-white mb-2">{confirmModal.title}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">{confirmModal.message}</p>
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setConfirmModal(null)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all focus:outline-none border-none cursor-pointer"
+                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all focus:outline-none border-none cursor-pointer min-h-[40px]"
                   >
                     Não, Cancelar
                   </button>
                   <button
                     type="button"
                     onClick={confirmModal.onConfirm}
-                    className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-rose-500/10 border-none cursor-pointer"
+                    className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-rose-500/10 border-none cursor-pointer min-h-[40px]"
                   >
                     Sim, Confirmar
                   </button>
